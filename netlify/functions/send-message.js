@@ -36,7 +36,6 @@ exports.handler = async (event) => {
     return { statusCode: 204, headers, body: '' };
   }
   
-  // Jika bukan POST, tolak.
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, headers, body: 'Method Not Allowed' };
   }
@@ -56,32 +55,26 @@ exports.handler = async (event) => {
     return { statusCode: 403, headers, body: 'Forbidden: Invalid token' };
   }
   
-  // Jika token valid, kita dapatkan email pengguna
   const userEmail = decodedToken.email;
 
   // --- Proses Inti: Simpan dan Kirim Pesan ---
   try {
     const { message } = JSON.parse(event.body);
     const chatMessage = {
-      username: userEmail, // Gunakan email dari token yang aman
+      username: userEmail,
       message: message,
       timestamp: new Date()
     };
 
-    // 1. Simpan pesan ke Firestore
     await db.collection('messages').add(chatMessage);
-    
-    // 2. Memicu Pusher untuk notifikasi real-time
     await pusher.trigger('chat-channel', 'new-message', chatMessage);
 
-    // Kirim respons sukses
     return {
       statusCode: 200,
       headers: headers,
       body: JSON.stringify({ status: 'success' })
     };
   } catch (error) {
-    // Jika terjadi error di bagian ini, log dan kirim respons 500
     console.error("SERVER ERROR saat proses pesan:", error);
     return {
       statusCode: 500,
