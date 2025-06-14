@@ -1,16 +1,18 @@
 const Pusher = require('pusher');
 const admin = require('firebase-admin');
 
-// Inisialisasi Firebase HANYA SEKALI
-if (admin.apps.length === 0) {
-  admin.initializeApp({
-    credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_CREDENTIALS))
-  });
+// Inisialisasi Firebase (pastikan hanya sekali)
+try {
+  if (admin.apps.length === 0) {
+    admin.initializeApp({
+      credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_CREDENTIALS))
+    });
+  }
+} catch (e) {
+  console.error("Firebase admin initialization error", e);
 }
 
-const db = admin.firestore();
-
-// Konfigurasi Pusher dari Environment Variables
+// Inisialisasi Pusher
 const pusher = new Pusher({
   appId: process.env.PUSHER_APP_ID,
   key: process.env.PUSHER_KEY,
@@ -19,55 +21,50 @@ const pusher = new Pusher({
   useTLS: true
 });
 
-// Ini adalah fungsi utama yang akan dijalankan oleh Netlify
+const db = admin.firestore();
+
 exports.handler = async (event) => {
   // Header untuk izin CORS
   const headers = {
-    'Access-Control-Allow-Origin': 'https://wyandhanupapoy.github.io', // Izinkan HANYA domain GitHub Anda
+    'Access-Control-Allow-Origin': '*', // Izinkan semua untuk kemudahan, bisa diperketat nanti
     'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Allow-Methods': 'POST, OPTIONS'
   };
 
-  // Jika ini adalah permintaan 'pemanasan' (preflight OPTIONS), langsung berikan izin dan selesai.
+  // Handle preflight request
   if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 204, // No Content
-      headers: headers,
-      body: ''
-    };
+    return { statusCode: 204, headers, body: '' };
   }
   
-  // Hanya proses permintaan POST
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, headers, body: 'Method Not Allowed' };
   }
 
   try {
     const { username, message } = JSON.parse(event.body);
-
-    // Memicu event Pusher
-    await pusher.trigger('chat-channel', 'new-message', {
+    const chatMessage = {
       username: username,
       message: message,
       timestamp: new Date()
-    });
+    };
 
+    // 1. Simpan pesan ke Firestore
     await db.collection('messages').add(chatMessage);
-
+    
+    // 2. Memicu Pusher
     await pusher.trigger('chat-channel', 'new-message', chatMessage);
 
     return {
       statusCode: 200,
-      headers: headers, // Kirim juga header di respons sukses
+      headers: headers,
       body: JSON.stringify({ status: 'success' })
     };
   } catch (error) {
-    // Jika ada error di server, kirim log dan respons error
-    console.error('SERVER ERROR:', error);
+    console.error("SERVER ERROR:", error); // Log error yang detail
     return {
       statusCode: 500,
-      headers: headers, // Kirim juga header di respons error
-      body: JSON.stringify({ error: 'Failed to send message on server' })
+      headers: headers,
+      body: JSON.stringify({ error: error.message })
     };
   }
 };

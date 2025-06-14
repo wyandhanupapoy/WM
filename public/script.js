@@ -11,16 +11,16 @@ const PUSHER_CLUSTER = 'ap1';
 // 3. Masukkan URL LENGKAP dari Netlify Function Anda
 const NETLIFY_FUNCTION_URL = 'https://chatwm.netlify.app/.netlify/functions/send-message';
 
-const GET_HISTORY_URL = 'URL_FUNGSI_GET_HISTORY_ANDA'; // Ganti dengan URL Netlify yang sesuai
+const GET_HISTORY_URL = 'https://chatwm.netlify.app/.netlify/functions/get-chat-history'; // Ganti dengan URL Netlify yang sesuai
 
 // =================================================================
 // == AKHIR DARI PENGATURAN WAJIB ==
 // =================================================================
 
-// Variabel untuk menyimpan nama pengguna saat ini
+// Variabel Global
 let username = '';
 
-// Mengambil semua elemen HTML yang kita butuhkan
+// Elemen DOM
 const loginScreen = document.getElementById('login-screen');
 const chatScreen = document.getElementById('chat-screen');
 const usernameInput = document.getElementById('username-input');
@@ -28,125 +28,98 @@ const joinChatBtn = document.getElementById('join-chat-btn');
 const messagesContainer = document.getElementById('messages');
 const messageForm = document.getElementById('message-form');
 const messageInput = document.getElementById('message-input');
+const userInfo = document.getElementById('user-info');
+const logoutBtn = document.getElementById('logout-btn');
 
-// Inisialisasi Pusher dengan kunci dan cluster Anda
-const pusher = new Pusher(PUSHER_KEY, {
-    cluster: PUSHER_CLUSTER,
-    useTLS: true
-});
-
-// Berlangganan (subscribe) ke channel bernama 'chat-channel'
-// Nama ini harus sama persis dengan yang ada di backend (Netlify Function)
+// --- Inisialisasi Pusher ---
+const pusher = new Pusher(PUSHER_KEY, { cluster: PUSHER_CLUSTER });
 const channel = pusher.subscribe('chat-channel');
 
-/**
- * Fungsi untuk menampilkan pesan di jendela chat.
- * @param {object} data - Objek data pesan yang berisi 'username' dan 'message'.
- */
+// --- Fungsi-Fungsi ---
 function displayMessage(data) {
     const messageEl = document.createElement('div');
     messageEl.classList.add('message');
-
-    // Jika pesan dikirim oleh pengguna saat ini, beri kelas 'own' untuk styling
     if (data.username === username) {
         messageEl.classList.add('own');
     }
-
-    // Struktur HTML untuk setiap pesan
+    // Konversi timestamp dari Firestore (jika ada) ke format yang lebih mudah dibaca
+    const time = data.timestamp ? new Date(data.timestamp._seconds * 1000).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '';
+    
     messageEl.innerHTML = `
-        <div class="sender">${data.username}</div>
+        <div class="sender">${data.username} <span class="time">${time}</span></div>
         <div class="text">${data.message}</div>
     `;
-
-    // Tambahkan elemen pesan ke dalam kontainer
     messagesContainer.appendChild(messageEl);
-
-    // Otomatis scroll ke pesan terbaru
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
-// Mengikat (bind) event 'new-message' ke fungsi displayMessage.
-// Setiap kali ada event 'new-message' di 'chat-channel', fungsi displayMessage akan dijalankan.
+async function fetchChatHistory() {
+    if (!GET_HISTORY_URL || GET_HISTORY_URL.includes('URL_FUNGSI')) {
+        console.warn("URL get history belum diatur");
+        return;
+    }
+    try {
+        const response = await fetch(GET_HISTORY_URL);
+        if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
+        const history = await response.json();
+        messagesContainer.innerHTML = ''; 
+        history.forEach(displayMessage);
+    } catch (error) {
+        console.error('Could not fetch chat history:', error);
+    }
+}
+
+function showChatUI(name) {
+    username = name;
+    userInfo.textContent = `Login sebagai: ${username}`;
+    loginScreen.classList.add('hidden');
+    chatScreen.classList.remove('hidden');
+    fetchChatHistory();
+    messageInput.focus();
+}
+
+// --- Event Listeners ---
 channel.bind('new-message', displayMessage);
 
-
-/**
- * Event Listener untuk tombol "Gabung Chat"
- */
 joinChatBtn.addEventListener('click', () => {
     const name = usernameInput.value.trim();
     if (name) {
-        username = name; // Simpan nama pengguna
-        loginScreen.classList.add('hidden'); // Sembunyikan layar login
-        chatScreen.classList.remove('hidden'); // Tampilkan layar chat
-        messageInput.focus(); // Fokuskan ke input pesan
-
-        fetchChatHistory(); 
-    } else {
-        alert("Nama tidak boleh kosong!");
+        localStorage.setItem('chat_username', name); // Simpan username
+        showChatUI(name);
     }
 });
 
-// Menambahkan fungsionalitas 'Enter' pada input username
-usernameInput.addEventListener('keyup', (e) => {
-    if (e.key === 'Enter') {
-        joinChatBtn.click();
-    }
-});
-
-/**
- * Event Listener untuk form pengiriman pesan
- */
 messageForm.addEventListener('submit', async (e) => {
-    // Mencegah form dari reload halaman
     e.preventDefault();
-
     const message = messageInput.value.trim();
-
-    // Pastikan pesan tidak kosong dan URL backend sudah diisi
-    if (message && NETLIFY_FUNCTION_URL !== 'GANTI_DENGAN_URL_LENGKAP_NETLIFY_FUNCTION_ANDA') {
+    if (message && username) {
         try {
-            // Kirim data pesan ke backend (Netlify Function) menggunakan fetch API
-            await fetch(NETLIFY_FUNCTION_URL, {
-                method: 'POST', // Menggunakan metode POST
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                // Ubah objek JavaScript menjadi string JSON untuk dikirim
-                body: JSON.stringify({
-                    username: username,
-                    message: message,
-                }),
+            await fetch(SEND_MESSAGE_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, message }),
             });
-
-            // Kosongkan input pesan setelah berhasil terkirim
             messageInput.value = '';
-
         } catch (error) {
             console.error('Error sending message:', error);
-            alert('Gagal mengirim pesan. Periksa konsol untuk detail.');
+            alert('Gagal mengirim pesan.');
         }
-    } else if (NETLIFY_FUNCTION_URL === 'GANTI_DENGAN_URL_LENGKAP_NETLIFY_FUNCTION_ANDA') {
-        alert('Kesalahan Konfigurasi: URL Netlify Function belum diatur di script.js!');
     }
-    
-    // Fokuskan kembali ke input pesan
-    messageInput.focus();
 });
 
-async function fetchChatHistory() {
-  try {
-    const response = await fetch(GET_HISTORY_URL);
-    if (!response.ok) {
-      throw new Error('Failed to fetch history');
+logoutBtn.addEventListener('click', () => {
+    localStorage.removeItem('chat_username'); // Hapus username
+    location.reload(); // Muat ulang halaman
+});
+
+// --- Logika Utama Saat Halaman Dimuat ---
+document.addEventListener('DOMContentLoaded', () => {
+    const savedUsername = localStorage.getItem('chat_username');
+    if (savedUsername) {
+        // Jika ada username tersimpan, langsung masuk ke chat
+        showChatUI(savedUsername);
+    } else {
+        // Jika tidak, tampilkan layar login
+        loginScreen.classList.remove('hidden');
     }
-    const history = await response.json();
-
-    // Hapus pesan lama (jika ada) dan tampilkan riwayat
-    messagesContainer.innerHTML = ''; 
-    history.forEach(displayMessage);
-
-  } catch (error) {
-    console.error('Could not fetch chat history:', error);
-  }
-}
+});

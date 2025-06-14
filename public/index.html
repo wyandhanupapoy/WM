@@ -11,10 +11,15 @@
         <div class="chat-window">
             <div id="login-screen">
                 <h2>Masukkan Nama Anda</h2>
-                <input type="text" id="username-input" placeholder="Nama Anda...">
+                <input type="text" id="username-input" placeholder="Nama Anda..." autocomplete="off">
                 <button id="join-chat-btn">Gabung Chat</button>
             </div>
+
             <div id="chat-screen" class="hidden">
+                <div class="chat-header">
+                    <div id="user-info"></div>
+                    <button id="logout-btn">Logout</button>
+                </div>
                 <div id="messages"></div>
                 <form id="message-form">
                     <input type="text" id="message-input" placeholder="Ketik pesan..." autocomplete="off" required>
