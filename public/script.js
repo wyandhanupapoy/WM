@@ -55,46 +55,30 @@ document.addEventListener('DOMContentLoaded', () => {
     let isLoginMode = true;
 
     // --- Fungsi-Fungsi ---
-
-    // DENGAN FUNGSI BARU INI:
     function displayMessage(data) {
         const messageWrapper = document.createElement('div');
         messageWrapper.classList.add('message-wrapper');
-
         const messageBubble = document.createElement('div');
         messageBubble.classList.add('message-bubble');
 
-        // Cek jika pengirim adalah pengguna saat ini (berdasarkan email)
         if (currentUser && data.username === currentUser.email) {
             messageWrapper.classList.add('own');
         }
 
-        // **PERBAIKAN BUG INVALID DATE DIMULAI DI SINI**
         let dateObject;
-        // Cek jika timestamp adalah objek dari Firestore (dari riwayat)
         if (data.timestamp && typeof data.timestamp === 'object' && data.timestamp._seconds) {
             dateObject = new Date(data.timestamp._seconds * 1000);
-        }
-        // Cek jika timestamp adalah string (dari Pusher real-time) atau angka
-        else if (data.timestamp) {
+        } else if (data.timestamp) {
             dateObject = new Date(data.timestamp);
-        }
-        // Jika tidak ada timestamp, buat tanggal saat ini
-        else {
+        } else {
             dateObject = new Date();
         }
 
-        // Pastikan dateObject valid sebelum memformatnya
-        const time = !isNaN(dateObject)
-            ? dateObject.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+        const time = !isNaN(dateObject) 
+            ? dateObject.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) 
             : '';
-        // **PERBAIKAN BUG SELESAI**
 
-        messageBubble.innerHTML = `
-        <p class="text">${data.message}</p>
-        <span class="time">${time}</span>
-    `;
-
+        messageBubble.innerHTML = `<p class="text">${data.message}</p><span class="time">${time}</span>`;
         messageWrapper.appendChild(messageBubble);
         messagesContainer.appendChild(messageWrapper);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -103,11 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchWithAuth(url, options = {}) {
         if (!currentUser) throw new Error("User not logged in");
         const idToken = await currentUser.getIdToken(true);
-        const headers = {
-            ...options.headers,
-            'Authorization': `Bearer ${idToken}`,
-            'Content-Type': 'application/json'
-        };
+        const headers = { ...options.headers, 'Authorization': `Bearer ${idToken}`, 'Content-Type': 'application/json' };
         return fetch(url, { ...options, headers });
     }
 
@@ -124,17 +104,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Logika Otentikasi ---
-
-    // **PERBAIKAN:** Menggunakan Event Delegation. Kita menaruh listener di parent.
     authToggleText.addEventListener('click', (e) => {
-        // Mencegah link dari refresh halaman
         e.preventDefault();
-        // Hanya jalankan jika yang diklik adalah link <a>
         if (e.target.tagName === 'A') {
             isLoginMode = !isLoginMode;
             authTitle.textContent = isLoginMode ? 'Login' : 'Daftar Akun Baru';
             authSubmitBtn.textContent = isLoginMode ? 'Login' : 'Daftar';
-            authToggleText.innerHTML = isLoginMode
+            authToggleText.innerHTML = isLoginMode 
                 ? 'Belum punya akun? <a href="#">Daftar di sini</a>'
                 : 'Sudah punya akun? <a href="#">Login di sini</a>';
             authError.textContent = '';
@@ -153,7 +129,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 await auth.createUserWithEmailAndPassword(email, password);
             }
         } catch (error) {
-            console.error("Authentication error:", error.message);
             authError.textContent = error.message;
         }
     });
@@ -162,13 +137,12 @@ document.addEventListener('DOMContentLoaded', () => {
         auth.signOut();
     });
 
-    // --- Pendengar Utama Status Otentikasi ---
     auth.onAuthStateChanged(user => {
         if (user) {
             currentUser = user;
             authScreen.classList.add('hidden');
             chatScreen.classList.remove('hidden');
-            userInfo.textContent = `Login sebagai: ${user.email}`;
+            userInfo.textContent = `Login: ${user.email}`;
             fetchChatHistory();
         } else {
             currentUser = null;
@@ -185,16 +159,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const message = messageInput.value.trim();
         if (message && currentUser) {
             try {
+                messageInput.value = ''; // Kosongkan input segera
                 await fetchWithAuth(SEND_MESSAGE_URL, {
                     method: 'POST',
                     body: JSON.stringify({ message: message }),
                 });
-                messageInput.value = '';
             } catch (error) {
                 console.error('Error sending message:', error);
-                alert('Gagal mengirim pesan.');
+                alert('Gagal mengirim pesan. Periksa konsol untuk detail.');
             }
         }
     });
 });
-
