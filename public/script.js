@@ -9,7 +9,7 @@ const PUSHER_KEY = '5c82ec0166360a9e296b';
 const PUSHER_CLUSTER = 'ap1';
 
 // 3. Masukkan URL LENGKAP dari Netlify Function Anda
-const NETLIFY_FUNCTION_URL = 'GANTI_DENGAN_URL_LENGKAP_NETLIFY_FUNCTION_ANDA';
+const NETLIFY_FUNCTION_URL = 'https://chatwm.netlify.app/.netlify/functions/send-message';
 
 // =================================================================
 // == AKHIR DARI PENGATURAN WAJIB ==
