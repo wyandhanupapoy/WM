@@ -168,3 +168,47 @@ const firebaseConfig = {
         }
     });
 });
+
+// DENGAN FUNGSI BARU INI:
+function displayMessage(data) {
+    const messageWrapper = document.createElement('div');
+    messageWrapper.classList.add('message-wrapper');
+
+    const messageBubble = document.createElement('div');
+    messageBubble.classList.add('message-bubble');
+
+    // Cek jika pengirim adalah pengguna saat ini (berdasarkan email)
+    if (currentUser && data.username === currentUser.email) {
+        messageWrapper.classList.add('own');
+    }
+
+    // **PERBAIKAN BUG INVALID DATE DIMULAI DI SINI**
+    let dateObject;
+    // Cek jika timestamp adalah objek dari Firestore (dari riwayat)
+    if (data.timestamp && typeof data.timestamp === 'object' && data.timestamp._seconds) {
+        dateObject = new Date(data.timestamp._seconds * 1000);
+    } 
+    // Cek jika timestamp adalah string (dari Pusher real-time) atau angka
+    else if (data.timestamp) {
+        dateObject = new Date(data.timestamp);
+    } 
+    // Jika tidak ada timestamp, buat tanggal saat ini
+    else {
+        dateObject = new Date();
+    }
+
+    // Pastikan dateObject valid sebelum memformatnya
+    const time = !isNaN(dateObject) 
+        ? dateObject.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) 
+        : '';
+    // **PERBAIKAN BUG SELESAI**
+
+    messageBubble.innerHTML = `
+        <p class="text">${data.message}</p>
+        <span class="time">${time}</span>
+    `;
+
+    messageWrapper.appendChild(messageBubble);
+    messagesContainer.appendChild(messageWrapper);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}

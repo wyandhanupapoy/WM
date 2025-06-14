@@ -1,38 +1,196 @@
-/* (Salin kode CSS dari jawaban sebelumnya atau kustomisasi sendiri) */
-/* Kode CSS yang lebih lengkap ada di bawah */
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #eee; }
-#app { display: flex; justify-content: center; align-items: center; height: 100vh; }
-.chat-window { width: 100%; max-width: 500px; height: 80vh; background: white; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
-#login-screen { padding: 20px; text-align: center; }
-#login-screen h2 { margin-top: 0; }
-#username-input, #join-chat-btn { width: 80%; padding: 10px; margin-top: 10px; border-radius: 5px; border: 1px solid #ccc; }
-#chat-screen { display: flex; flex-direction: column; height: 100%; }
-#messages { flex: 1; padding: 20px; overflow-y: auto; }
-.message { margin-bottom: 15px; }
-.message .sender { font-weight: bold; color: #007bff; display: block; margin-bottom: 3px; }
-.message .text { background: #f1f1f1; padding: 10px 15px; border-radius: 18px; display: inline-block; max-width: 80%; }
-.message.own .text { background: #007bff; color: white; }
-.message.own { text-align: right; }
-#message-form { display: flex; padding: 10px; border-top: 1px solid #ddd; }
-#message-input { flex: 1; border: none; padding: 10px; border-radius: 20px; background: #f1f1f1; }
-#message-form button { background: #007bff; color: white; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 20px; cursor: pointer; margin-left: 10px; }
+/* --- Reset & Pengaturan Dasar --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #e5ddd5; /* Latar belakang khas aplikasi chat */
+    color: #333;
+    overflow: hidden; /* Mencegah body scroll di mobile */
+}
+
+#app {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+
+/* --- Tampilan Desktop (Layar Besar) --- */
+@media (min-width: 769px) {
+    body {
+        background-image: url('https://i.imgur.com/v112a14.png'); /* Pola latar belakang WhatsApp */
+        background-repeat: repeat;
+    }
+    .chat-window {
+        max-width: 800px;
+        width: 100%;
+        max-height: 95vh;
+        height: 100%;
+        border-radius: 8px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    }
+}
+
+/* --- Kontainer Utama --- */
+.chat-window {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+}
+
+/* --- Layar Login & Registrasi --- */
+#auth-screen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+.auth-container {
+    width: 90%;
+    max-width: 400px;
+    padding: 30px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    text-align: center;
+}
+.auth-container h2 { margin-bottom: 20px; }
+.auth-container input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+.auth-container button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    background-color: #075E54;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.auth-container button:hover { background-color: #128C7E; }
+.error-message { color: #d93025; min-height: 20px; font-size: 0.9em; }
+#auth-toggle-text { margin-top: 20px; font-size: 0.9em; }
+#auth-toggle-text a { color: #075E54; text-decoration: none; font-weight: 500; }
+
+/* --- Layar Chat --- */
 .hidden { display: none !important; }
+
 .chat-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 20px;
-    background: #f7f7f7;
-    border-bottom: 1px solid #ddd;
-}
-#user-info {
-    font-weight: bold;
-}
-#logout-btn {
-    background: #dc3545;
+    padding: 10px 15px;
+    background-color: #075E54;
     color: white;
-    border: none;
+    flex-shrink: 0; /* Mencegah header menyusut */
+}
+#user-info { font-weight: 500; }
+#logout-btn {
+    background: transparent;
+    border: 1px solid #fff;
+    color: white;
     padding: 5px 10px;
     border-radius: 5px;
     cursor: pointer;
+    transition: background-color 0.2s;
 }
+#logout-btn:hover { background-color: rgba(255,255,255,0.1); }
+
+.messages-container {
+    flex-grow: 1; /* Paling penting: membuat area pesan memanjang */
+    overflow-y: auto; /* Aktifkan scroll vertikal */
+    padding: 20px;
+    background-color: #e5ddd5;
+}
+
+.message-wrapper {
+    display: flex;
+    margin-bottom: 10px;
+}
+.message-bubble {
+    max-width: 75%;
+    padding: 8px 12px;
+    border-radius: 18px;
+    position: relative;
+    word-wrap: break-word;
+}
+.message-bubble .sender {
+    font-weight: 500;
+    font-size: 0.85em;
+    margin-bottom: 3px;
+    display: none; /* Sembunyikan nama, karena sudah jelas dari posisi */
+}
+.message-bubble .text { line-height: 1.4; }
+.message-bubble .time {
+    font-size: 0.75em;
+    color: #888;
+    margin-top: 5px;
+    text-align: right;
+    display: block;
+}
+
+/* Pesan dari Orang Lain (KIRI) */
+.message-wrapper {
+    justify-content: flex-start;
+}
+.message-bubble {
+    background-color: #ffffff;
+    border-top-left-radius: 0;
+}
+
+/* Pesan Milik Sendiri (KANAN) */
+.message-wrapper.own {
+    justify-content: flex-end;
+}
+.message-wrapper.own .message-bubble {
+    background-color: #dcf8c6; /* Warna hijau khas WhatsApp */
+    border-top-right-radius: 0;
+}
+.message-wrapper.own .time { color: #667781; }
+
+.message-input-area {
+    padding: 10px;
+    background-color: #f0f0f0;
+    flex-shrink: 0;
+}
+#message-form { display: flex; align-items: center; }
+#message-input {
+    flex-grow: 1;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 25px;
+    font-size: 1rem;
+}
+#message-form button {
+    background-color: #075E54;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+#message-form button:hover { background-color: #128C7E; }

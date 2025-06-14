@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplikasi Chat Real-time</title>
+    <title>Chat App Modern</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
     <div id="app">
@@ -17,7 +20,7 @@
                     <p id="auth-error" class="error-message"></p>
                     <button type="submit" id="auth-submit-btn">Login</button>
                 </form>
-                <p id="auth-toggle-text">Belum punya akun? <a href="#" id="toggle-to-register">Daftar di sini</a></p>
+                <p id="auth-toggle-text">Belum punya akun? <a href="#">Daftar di sini</a></p>
             </div>
         </div>
 
@@ -26,17 +29,23 @@
                 <div id="user-info"></div>
                 <button id="logout-btn">Logout</button>
             </div>
-            <div id="messages"></div>
-            <form id="message-form">
-                <input type="text" id="message-input" placeholder="Ketik pesan..." autocomplete="off" required>
-                <button type="submit">➤</button>
-            </form>
+            <div id="messages" class="messages-container">
+                </div>
+            <div class="message-input-area">
+                <form id="message-form">
+                    <input type="text" id="message-input" placeholder="Ketik pesan..." autocomplete="off" required>
+                    <button type="submit" aria-label="Kirim Pesan">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+                            <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
+                        </svg>                          
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
-    
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
     <script src="script.js"></script>
 </body>
