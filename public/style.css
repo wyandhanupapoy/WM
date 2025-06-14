@@ -1,4 +1,19 @@
-/* --- Reset & Pengaturan Dasar --- */
+/* --- FONDASI & TEMA WARNA --- */
+:root {
+    --page-bg: #f0f2f5;
+    --app-bg: #ffffff;
+    --header-bg: #0078D4;
+    --bubble-friend-bg: #E9E9EB;
+    --bubble-own-bg: #0078D4;
+    --text-primary: #050505;
+    --text-secondary: #65676B;
+    --text-own: #ffffff;
+    --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --border-color: #ced0d4;
+    --shadow-light: rgba(0, 0, 0, 0.1);
+    --shadow-medium: rgba(0, 0, 0, 0.15);
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -10,9 +25,9 @@ html, body {
 }
 
 body {
-    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: #f0f2f5;
-    color: #333;
+    font-family: var(--font-family);
+    background-color: var(--page-bg);
+    color: var(--text-primary);
     overflow: hidden;
 }
 
@@ -22,144 +37,176 @@ body {
     align-items: center;
     height: 100%;
     width: 100%;
+    padding: 0;
 }
 
-/* --- Tampilan Desktop (Layar Besar) --- */
 @media (min-width: 769px) {
     #app {
-        background-color: #e5ddd5;
-        background-image: url('https://i.imgur.com/v112a14.png');
-        background-repeat: repeat;
-    }
-    .chat-window, .auth-container {
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
+        padding: 20px;
     }
 }
 
-/* --- Kontainer Utama --- */
+/* --- KONTENER UTAMA --- */
 .chat-window, #auth-screen {
     display: flex;
     flex-direction: column;
     width: 100%;
     height: 100%;
-    background-color: #fff;
+    background-color: var(--app-bg);
+    transition: all 0.3s ease;
 }
 
 @media (min-width: 769px) {
     .chat-window, #auth-screen {
-        max-width: 800px;
-        max-height: 95vh;
+        max-width: 420px;
+        max-height: 85vh;
+        border-radius: 12px;
+        box-shadow: 0 8px 30px var(--shadow-medium);
+        border: 1px solid var(--border-color);
     }
 }
 
-/* --- Layar Login & Registrasi --- */
+/* --- LAYAR LOGIN & REGISTRASI --- */
 #auth-screen {
     justify-content: center;
     align-items: center;
 }
 .auth-container {
     width: 90%;
-    max-width: 400px;
-    padding: 30px;
-    background: #fff;
+    max-width: 380px;
+    padding: 30px 25px;
     text-align: center;
 }
-.auth-container h2 { margin-bottom: 20px; color: #444; }
+.auth-container h2 { 
+    margin-bottom: 25px; 
+    color: var(--text-primary);
+    font-weight: 600;
+}
 .auth-container input {
     width: 100%;
-    padding: 12px;
-    margin-bottom: 15px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    padding: 14px;
+    margin-bottom: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
     font-size: 1rem;
+    font-family: var(--font-family);
+}
+.auth-container input:focus {
+    outline: none;
+    border-color: var(--header-bg);
+    box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.3);
 }
 .auth-container button {
     width: 100%;
-    padding: 12px;
+    padding: 14px;
     border: none;
-    border-radius: 5px;
-    background-color: #075E54;
+    border-radius: 8px;
+    background-color: var(--header-bg);
     color: white;
     font-size: 1rem;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
     transition: background-color 0.2s;
 }
-.auth-container button:hover { background-color: #128C7E; }
+.auth-container button:hover { background-color: #005A9E; }
 .error-message { color: #d93025; min-height: 20px; font-size: 0.9em; }
-#auth-toggle-text { margin-top: 20px; font-size: 0.9em; }
-#auth-toggle-text a { color: #075E54; text-decoration: none; font-weight: 500; }
+#auth-toggle-text { margin-top: 20px; font-size: 0.9em; color: var(--text-secondary); }
+#auth-toggle-text a { color: var(--header-bg); text-decoration: none; font-weight: 600; }
 
-/* --- Layar Chat --- */
+/* --- LAYAR CHAT --- */
 .hidden { display: none !important; }
 
 .chat-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 15px;
-    background-color: #075E54;
+    padding: 12px 16px;
+    background-color: var(--header-bg);
     color: white;
     flex-shrink: 0;
+    border-bottom: 1px solid #005A9E;
 }
 #user-info { font-weight: 500; }
 #logout-btn {
     background: transparent;
-    border: 1px solid #fff;
+    border: none;
     color: white;
-    padding: 5px 10px;
+    padding: 5px;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    font-weight: 500;
+    opacity: 0.8;
+    transition: opacity 0.2s;
 }
-#logout-btn:hover { background-color: rgba(255,255,255,0.1); }
+#logout-btn:hover { opacity: 1; }
 
 .messages-container {
     flex-grow: 1;
     overflow-y: auto;
-    padding: 10px;
-    background-color: #e5ddd5;
+    padding: 20px 10px;
+    background-color: var(--app-bg);
+    scroll-behavior: smooth;
 }
 
 .message-wrapper {
     display: flex;
-    margin-bottom: 4px;
-    padding: 0 10px;
+    margin-bottom: 12px;
 }
 .message-bubble {
-    max-width: 75%;
-    padding: 8px 12px;
-    border-radius: 8px;
+    max-width: 80%;
+    padding: 10px 14px;
+    border-radius: 20px;
     word-wrap: break-word;
-    box-shadow: 0 1px 1px rgba(0,0,0,0.05);
+    position: relative;
 }
-.message-bubble .text { line-height: 1.4; font-size: 0.95rem; }
+.message-bubble .text { line-height: 1.5; font-size: 0.95rem; }
 .message-bubble .time {
     font-size: 0.7em;
-    color: #888;
-    margin-top: 5px;
+    margin-top: 4px;
     text-align: right;
     display: block;
     user-select: none;
+    opacity: 0.7;
 }
 
 /* Pesan dari Orang Lain (KIRI) */
 .message-wrapper { justify-content: flex-start; }
-.message-bubble { background-color: #ffffff; }
+.message-bubble {
+    background-color: var(--bubble-friend-bg);
+    color: var(--text-primary);
+}
+.message-bubble::before { /* Membuat "buntut" bubble */
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: -6px;
+    width: 12px;
+    height: 12px;
+    background: radial-gradient(circle at 0 0, transparent, transparent 11px, var(--bubble-friend-bg) 12px);
+}
 
 /* Pesan Milik Sendiri (KANAN) */
 .message-wrapper.own { justify-content: flex-end; }
 .message-wrapper.own .message-bubble {
-    background-color: #dcf8c6;
+    background-color: var(--bubble-own-bg);
+    color: var(--text-own);
 }
-.message-wrapper.own .time { color: #667781; }
+.message-wrapper.own .time { color: var(--text-own); }
+.message-wrapper.own .message-bubble::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: -6px;
+    width: 12px;
+    height: 12px;
+    background: radial-gradient(circle at 100% 0, transparent, transparent 11px, var(--bubble-own-bg) 12px);
+}
 
 .message-input-area {
-    padding: 8px 12px;
-    background-color: #f0f2f5;
+    padding: 10px 12px;
+    background-color: #f9f9f9;
     flex-shrink: 0;
-    border-top: 1px solid #ddd;
+    border-top: 1px solid #e0e0e0;
 }
 #message-form { display: flex; align-items: center; }
 #message-input {
@@ -168,21 +215,24 @@ body {
     padding: 12px 18px;
     border-radius: 25px;
     font-size: 1rem;
-    background-color: #fff;
+    background-color: #e9e9eb;
+    font-family: var(--font-family);
 }
+#message-input:focus { outline: none; }
 #message-form button {
-    background-color: #075E54;
+    background-color: var(--header-bg);
     color: white;
     border: none;
     border-radius: 50%;
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
     display: flex;
     justify-content: center;
     align-items: center;
     margin-left: 10px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: transform 0.2s, background-color 0.2s;
     flex-shrink: 0;
 }
-#message-form button:hover { background-color: #128C7E; }
+#message-form button:hover { transform: scale(1.1); }
+#message-form button:active { transform: scale(0.95); }
