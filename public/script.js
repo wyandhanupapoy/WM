@@ -1,3 +1,5 @@
+// Membungkus semua kode di dalam DOMContentLoaded untuk memastikan HTML sudah siap
+document.addEventListener('DOMContentLoaded', () => {
 // =================================================================
 // == PENGATURAN WAJIB - GANTI NILAI DI BAWAH INI ==
 // =================================================================
@@ -28,154 +30,140 @@ const firebaseConfig = {
 };
 
 // --- Inisialisasi Layanan ---
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const pusher = new Pusher(PUSHER_KEY, { cluster: PUSHER_CLUSTER });
-const channel = pusher.subscribe('chat-channel');
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const pusher = new Pusher(PUSHER_KEY, { cluster: PUSHER_CLUSTER });
+    const channel = pusher.subscribe('chat-channel');
 
-// --- Variabel Global & Elemen DOM ---
-let currentUser = null;
-const authScreen = document.getElementById('auth-screen');
-const chatScreen = document.getElementById('chat-screen');
-const authForm = document.getElementById('auth-form');
-const authEmailInput = document.getElementById('auth-email');
-const authPasswordInput = document.getElementById('auth-password');
-const authError = document.getElementById('auth-error');
-const authSubmitBtn = document.getElementById('auth-submit-btn');
-const authTitle = document.getElementById('auth-title');
-const authToggleText = document.getElementById('auth-toggle-text');
-const toggleToRegister = document.getElementById('toggle-to-register');
-const userInfo = document.getElementById('user-info');
-const logoutBtn = document.getElementById('logout-btn');
-const messagesContainer = document.getElementById('messages');
-const messageForm = document.getElementById('message-form');
-const messageInput = document.getElementById('message-input');
-let isLoginMode = true;
+    // --- Variabel Global & Elemen DOM ---
+    let currentUser = null;
+    const authScreen = document.getElementById('auth-screen');
+    const chatScreen = document.getElementById('chat-screen');
+    const authForm = document.getElementById('auth-form');
+    const authEmailInput = document.getElementById('auth-email');
+    const authPasswordInput = document.getElementById('auth-password');
+    const authError = document.getElementById('auth-error');
+    const authSubmitBtn = document.getElementById('auth-submit-btn');
+    const authTitle = document.getElementById('auth-title');
+    const authToggleText = document.getElementById('auth-toggle-text');
+    const userInfo = document.getElementById('user-info');
+    const logoutBtn = document.getElementById('logout-btn');
+    const messagesContainer = document.getElementById('messages');
+    const messageForm = document.getElementById('message-form');
+    const messageInput = document.getElementById('message-input');
+    let isLoginMode = true;
 
-// --- Fungsi-Fungsi ---
+    // --- Fungsi-Fungsi ---
 
-function displayMessage(data) {
-    const messageEl = document.createElement('div');
-    messageEl.classList.add('message');
-    // Cek jika pengirim adalah pengguna saat ini (berdasarkan email)
-    if (currentUser && data.username === currentUser.email) {
-        messageEl.classList.add('own');
-    }
-    const time = data.timestamp ? new Date(data.timestamp._seconds * 1000).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '';
-    
-    messageEl.innerHTML = `
-        <div class="sender">${data.username} <span class="time">${time}</span></div>
-        <div class="text">${data.message}</div>
-    `;
-    messagesContainer.appendChild(messageEl);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-}
-
-// Fungsi untuk mengambil data dengan menyertakan token otentikasi
-async function fetchWithAuth(url, options = {}) {
-    if (!currentUser) throw new Error("User not logged in");
-    
-    const idToken = await currentUser.getIdToken(true);
-    
-    const headers = {
-        ...options.headers,
-        'Authorization': `Bearer ${idToken}`,
-        'Content-Type': 'application/json'
-    };
-
-    return fetch(url, { ...options, headers });
-}
-
-async function fetchChatHistory() {
-    try {
-        const response = await fetchWithAuth(GET_HISTORY_URL);
-        if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
-        const history = await response.json();
-        messagesContainer.innerHTML = ''; 
-        history.forEach(displayMessage);
-    } catch (error) {
-        console.error('Could not fetch chat history:', error);
-    }
-}
-
-// --- Logika Otentikasi ---
-
-// Toggle antara mode Login dan Registrasi
-function toggleAuthMode() {
-    isLoginMode = !isLoginMode;
-    authTitle.textContent = isLoginMode ? 'Login' : 'Daftar Akun Baru';
-    authSubmitBtn.textContent = isLoginMode ? 'Login' : 'Daftar';
-    authToggleText.innerHTML = isLoginMode 
-        ? 'Belum punya akun? <a href="#" id="toggle-to-register">Daftar di sini</a>'
-        : 'Sudah punya akun? <a href="#" id="toggle-to-register">Login di sini</a>';
-    document.getElementById('toggle-to-register').addEventListener('click', toggleAuthMode);
-    authError.textContent = '';
-}
-toggleToRegister.addEventListener('click', toggleAuthMode);
-
-
-// Handle submit form (login atau registrasi)
-authForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = authEmailInput.value;
-    const password = authPasswordInput.value;
-    authError.textContent = '';
-
-    try {
-        if (isLoginMode) {
-            // Proses Login
-            await auth.signInWithEmailAndPassword(email, password);
-        } else {
-            // Proses Registrasi
-            await auth.createUserWithEmailAndPassword(email, password);
+    function displayMessage(data) {
+        const messageEl = document.createElement('div');
+        messageEl.classList.add('message');
+        if (currentUser && data.username === currentUser.email) {
+            messageEl.classList.add('own');
         }
-        // State change akan ditangani oleh onAuthStateChanged
-    } catch (error) {
-        console.error("Authentication error:", error.message);
-        authError.textContent = error.message;
+        const time = data.timestamp ? new Date(data.timestamp._seconds * 1000).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '';
+        messageEl.innerHTML = `
+            <div class="sender">${data.username} <span class="time">${time}</span></div>
+            <div class="text">${data.message}</div>
+        `;
+        messagesContainer.appendChild(messageEl);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
-});
 
-// Proses Logout
-logoutBtn.addEventListener('click', () => {
-    auth.signOut();
-});
-
-// --- Pendengar Utama Status Otentikasi ---
-
-auth.onAuthStateChanged(user => {
-    if (user) {
-        // Pengguna berhasil login
-        currentUser = user;
-        authScreen.classList.add('hidden');
-        chatScreen.classList.remove('hidden');
-        userInfo.textContent = `Login sebagai: ${user.email}`;
-        fetchChatHistory();
-    } else {
-        // Pengguna logout atau belum login
-        currentUser = null;
-        authScreen.classList.remove('hidden');
-        chatScreen.classList.add('hidden');
+    async function fetchWithAuth(url, options = {}) {
+        if (!currentUser) throw new Error("User not logged in");
+        const idToken = await currentUser.getIdToken(true);
+        const headers = {
+            ...options.headers,
+            'Authorization': `Bearer ${idToken}`,
+            'Content-Type': 'application/json'
+        };
+        return fetch(url, { ...options, headers });
     }
-});
 
-// --- Event Listeners Lainnya ---
-
-channel.bind('new-message', displayMessage);
-
-messageForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const message = messageInput.value.trim();
-    if (message && currentUser) {
+    async function fetchChatHistory() {
         try {
-            await fetchWithAuth(SEND_MESSAGE_URL, {
-                method: 'POST',
-                body: JSON.stringify({ message: message }), // username akan diambil dari token di backend
-            });
-            messageInput.value = '';
+            const response = await fetchWithAuth(GET_HISTORY_URL);
+            if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
+            const history = await response.json();
+            messagesContainer.innerHTML = '';
+            history.forEach(displayMessage);
         } catch (error) {
-            console.error('Error sending message:', error);
-            alert('Gagal mengirim pesan.');
+            console.error('Could not fetch chat history:', error);
         }
     }
+
+    // --- Logika Otentikasi ---
+
+    // **PERBAIKAN:** Menggunakan Event Delegation. Kita menaruh listener di parent.
+    authToggleText.addEventListener('click', (e) => {
+        // Mencegah link dari refresh halaman
+        e.preventDefault(); 
+        // Hanya jalankan jika yang diklik adalah link <a>
+        if (e.target.tagName === 'A') {
+            isLoginMode = !isLoginMode;
+            authTitle.textContent = isLoginMode ? 'Login' : 'Daftar Akun Baru';
+            authSubmitBtn.textContent = isLoginMode ? 'Login' : 'Daftar';
+            authToggleText.innerHTML = isLoginMode 
+                ? 'Belum punya akun? <a href="#">Daftar di sini</a>'
+                : 'Sudah punya akun? <a href="#">Login di sini</a>';
+            authError.textContent = '';
+        }
+    });
+
+    authForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = authEmailInput.value;
+        const password = authPasswordInput.value;
+        authError.textContent = '';
+        try {
+            if (isLoginMode) {
+                await auth.signInWithEmailAndPassword(email, password);
+            } else {
+                await auth.createUserWithEmailAndPassword(email, password);
+            }
+        } catch (error) {
+            console.error("Authentication error:", error.message);
+            authError.textContent = error.message;
+        }
+    });
+
+    logoutBtn.addEventListener('click', () => {
+        auth.signOut();
+    });
+
+    // --- Pendengar Utama Status Otentikasi ---
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            currentUser = user;
+            authScreen.classList.add('hidden');
+            chatScreen.classList.remove('hidden');
+            userInfo.textContent = `Login sebagai: ${user.email}`;
+            fetchChatHistory();
+        } else {
+            currentUser = null;
+            authScreen.classList.remove('hidden');
+            chatScreen.classList.add('hidden');
+        }
+    });
+
+    // --- Event Listeners Lainnya ---
+    channel.bind('new-message', displayMessage);
+
+    messageForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const message = messageInput.value.trim();
+        if (message && currentUser) {
+            try {
+                await fetchWithAuth(SEND_MESSAGE_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ message: message }),
+                });
+                messageInput.value = '';
+            } catch (error) {
+                console.error('Error sending message:', error);
+                alert('Gagal mengirim pesan.');
+            }
+        }
+    });
 });
