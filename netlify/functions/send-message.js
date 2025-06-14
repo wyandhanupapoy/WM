@@ -1,4 +1,14 @@
 const Pusher = require('pusher');
+const admin = require('firebase-admin');
+
+// Inisialisasi Firebase HANYA SEKALI
+if (admin.apps.length === 0) {
+  admin.initializeApp({
+    credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_CREDENTIALS))
+  });
+}
+
+const db = admin.firestore();
 
 // Konfigurasi Pusher dari Environment Variables
 const pusher = new Pusher({
@@ -38,8 +48,13 @@ exports.handler = async (event) => {
     // Memicu event Pusher
     await pusher.trigger('chat-channel', 'new-message', {
       username: username,
-      message: message
+      message: message,
+      timestamp: new Date()
     });
+
+    await db.collection('messages').add(chatMessage);
+
+    await pusher.trigger('chat-channel', 'new-message', chatMessage);
 
     return {
       statusCode: 200,

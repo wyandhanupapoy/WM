@@ -11,6 +11,8 @@ const PUSHER_CLUSTER = 'ap1';
 // 3. Masukkan URL LENGKAP dari Netlify Function Anda
 const NETLIFY_FUNCTION_URL = 'https://chatwm.netlify.app/.netlify/functions/send-message';
 
+const GET_HISTORY_URL = 'URL_FUNGSI_GET_HISTORY_ANDA'; // Ganti dengan URL Netlify yang sesuai
+
 // =================================================================
 // == AKHIR DARI PENGATURAN WAJIB ==
 // =================================================================
@@ -78,6 +80,8 @@ joinChatBtn.addEventListener('click', () => {
         loginScreen.classList.add('hidden'); // Sembunyikan layar login
         chatScreen.classList.remove('hidden'); // Tampilkan layar chat
         messageInput.focus(); // Fokuskan ke input pesan
+
+        fetchChatHistory(); 
     } else {
         alert("Nama tidak boleh kosong!");
     }
@@ -129,3 +133,20 @@ messageForm.addEventListener('submit', async (e) => {
     // Fokuskan kembali ke input pesan
     messageInput.focus();
 });
+
+async function fetchChatHistory() {
+  try {
+    const response = await fetch(GET_HISTORY_URL);
+    if (!response.ok) {
+      throw new Error('Failed to fetch history');
+    }
+    const history = await response.json();
+
+    // Hapus pesan lama (jika ada) dan tampilkan riwayat
+    messagesContainer.innerHTML = ''; 
+    history.forEach(displayMessage);
+
+  } catch (error) {
+    console.error('Could not fetch chat history:', error);
+  }
+}
