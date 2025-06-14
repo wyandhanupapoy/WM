@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -35,7 +36,8 @@
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        html, body {
+        html,
+        body {
             height: 100%;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             overflow: hidden;
@@ -54,7 +56,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: 
+            background:
                 radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
                 radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
                 radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.3) 0%, transparent 50%);
@@ -63,9 +65,19 @@
         }
 
         @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            33% { transform: translateY(-20px) rotate(1deg); }
-            66% { transform: translateY(10px) rotate(-1deg); }
+
+            0%,
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            33% {
+                transform: translateY(-20px) rotate(1deg);
+            }
+
+            66% {
+                transform: translateY(10px) rotate(-1deg);
+            }
         }
 
         #app {
@@ -74,6 +86,21 @@
             align-items: center;
             min-height: 100%;
             padding: 20px;
+        }
+
+        .message-bubble .sender-name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            /* Menggunakan warna tema utama */
+            margin-bottom: 0.3rem;
+            padding-bottom: 0.3rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .message-wrapper.own .message-bubble .sender-name {
+            /* Kita tidak menampilkan nama untuk pesan sendiri, tapi ini untuk jaga-jaga */
+            display: none;
         }
 
         /* === AUTH SCREEN === */
@@ -102,6 +129,7 @@
                 opacity: 0;
                 transform: translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -174,7 +202,7 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
             transition: left 0.5s;
         }
 
@@ -225,8 +253,8 @@
         #chat-screen {
             width: 100%;
             max-width: 1200px;
-            height: 90vh;
-            max-height: 800px;
+            height: 70vh;
+            max-height: 700px;
             display: flex;
             flex-direction: column;
         }
@@ -311,6 +339,7 @@
                 opacity: 0;
                 transform: translateY(10px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -523,7 +552,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         /* === ENHANCED INTERACTIONS === */
@@ -532,9 +563,17 @@
         }
 
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(168, 85, 247, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0); }
+            0% {
+                box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(168, 85, 247, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(168, 85, 247, 0);
+            }
         }
 
         /* === DARK MODE SUPPORT === */
@@ -546,6 +585,7 @@
         }
     </style>
 </head>
+
 <body>
     <div id="app">
         <div id="auth-screen">
@@ -556,7 +596,8 @@
                         <input type="email" id="auth-email" placeholder="Email" required autocomplete="email">
                     </div>
                     <div class="input-group">
-                        <input type="password" id="auth-password" placeholder="Password" required autocomplete="current-password">
+                        <input type="password" id="auth-password" placeholder="Password" required
+                            autocomplete="current-password">
                     </div>
                     <p id="auth-error" class="error-message"></p>
                     <button type="submit" id="auth-submit-btn" class="auth-submit-btn">Login</button>
@@ -576,9 +617,11 @@
                     <form id="message-form">
                         <input type="text" id="message-input" placeholder="Ketik pesan..." autocomplete="off" required>
                         <button type="submit" class="send-button" aria-label="Kirim Pesan">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-                                <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
-                            </svg>                          
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20"
+                                height="20">
+                                <path
+                                    d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
+                            </svg>
                         </button>
                     </form>
                 </div>
@@ -607,7 +650,7 @@
 
             const GET_HISTORY_URL = 'https://chatwm.netlify.app/.netlify/functions/get-chat-history';
             const SEND_MESSAGE_URL = 'https://chatwm.netlify.app/.netlify/functions/send-message';
-            
+
             // 1. Salin objek konfigurasi Firebase Anda di sini
             const firebaseConfig = {
                 apiKey: "AIzaSyAdNwK-04FA4fxOEZQ2FDWpjzRYv4SG6zA",
@@ -643,17 +686,30 @@
             const messageInput = document.getElementById('message-input');
             let isLoginMode = true;
 
-            // --- Fungsi-Fungsi ---
+            // DENGAN FUNGSI BARU YANG LEBIH LENGKAP INI:
             function displayMessage(data) {
                 const messageWrapper = document.createElement('div');
                 messageWrapper.classList.add('message-wrapper');
+
                 const messageBubble = document.createElement('div');
                 messageBubble.classList.add('message-bubble');
 
+                // Cek jika pengirim adalah pengguna saat ini (berdasarkan email)
                 if (currentUser && data.username === currentUser.email) {
                     messageWrapper.classList.add('own');
                 }
 
+                // --- LOGIKA BARU UNTUK MENAMBAHKAN NAMA PENGIRIM ---
+                let senderNameHTML = '';
+                // Hanya tampilkan nama pengirim jika pesan tersebut BUKAN milik kita
+                if (!messageWrapper.classList.contains('own')) {
+                    // Membersihkan email untuk keamanan (mencegah injeksi HTML)
+                    const sanitizedUsername = data.username.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    senderNameHTML = `<div class="sender-name">${sanitizedUsername}</div>`;
+                }
+                // --- AKHIR DARI LOGIKA BARU ---
+
+                // Logika timestamp dari sebelumnya (sudah benar)
                 let dateObject;
                 if (data.timestamp && typeof data.timestamp === 'object' && data.timestamp._seconds) {
                     dateObject = new Date(data.timestamp._seconds * 1000);
@@ -663,11 +719,17 @@
                     dateObject = new Date();
                 }
 
-                const time = !isNaN(dateObject) 
-                    ? dateObject.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) 
+                const time = !isNaN(dateObject)
+                    ? dateObject.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
                     : '';
 
-                messageBubble.innerHTML = `<p class="text">${data.message}</p><span class="time">${time}</span>`;
+                // Gabungkan nama pengirim (jika ada), teks pesan, dan waktu
+                messageBubble.innerHTML = `
+        ${senderNameHTML}
+        <p class="text">${data.message}</p>
+        <span class="time">${time}</span>
+    `;
+
                 messageWrapper.appendChild(messageBubble);
                 messagesContainer.appendChild(messageWrapper);
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -699,7 +761,7 @@
                     isLoginMode = !isLoginMode;
                     authTitle.textContent = isLoginMode ? 'Login' : 'Daftar Akun Baru';
                     authSubmitBtn.textContent = isLoginMode ? 'Login' : 'Daftar';
-                    authToggleText.innerHTML = isLoginMode 
+                    authToggleText.innerHTML = isLoginMode
                         ? 'Belum punya akun? <a href="#">Daftar di sini</a>'
                         : 'Sudah punya akun? <a href="#">Login di sini</a>';
                     authError.textContent = '';
@@ -711,12 +773,12 @@
                 const email = authEmailInput.value;
                 const password = authPasswordInput.value;
                 authError.textContent = '';
-                
+
                 // Show loading state
                 const originalText = authSubmitBtn.textContent;
                 authSubmitBtn.innerHTML = '<div class="loading"></div>';
                 authSubmitBtn.disabled = true;
-                
+
                 try {
                     if (isLoginMode) {
                         await auth.signInWithEmailAndPassword(email, password);
@@ -771,4 +833,5 @@
         });
     </script>
 </body>
+
 </html>
