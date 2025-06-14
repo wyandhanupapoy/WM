@@ -1,0 +1,19 @@
+/* (Salin kode CSS dari jawaban sebelumnya atau kustomisasi sendiri) */
+/* Kode CSS yang lebih lengkap ada di bawah */
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #eee; }
+#app { display: flex; justify-content: center; align-items: center; height: 100vh; }
+.chat-window { width: 100%; max-width: 500px; height: 80vh; background: white; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+#login-screen { padding: 20px; text-align: center; }
+#login-screen h2 { margin-top: 0; }
+#username-input, #join-chat-btn { width: 80%; padding: 10px; margin-top: 10px; border-radius: 5px; border: 1px solid #ccc; }
+#chat-screen { display: flex; flex-direction: column; height: 100%; }
+#messages { flex: 1; padding: 20px; overflow-y: auto; }
+.message { margin-bottom: 15px; }
+.message .sender { font-weight: bold; color: #007bff; display: block; margin-bottom: 3px; }
+.message .text { background: #f1f1f1; padding: 10px 15px; border-radius: 18px; display: inline-block; max-width: 80%; }
+.message.own .text { background: #007bff; color: white; }
+.message.own { text-align: right; }
+#message-form { display: flex; padding: 10px; border-top: 1px solid #ddd; }
+#message-input { flex: 1; border: none; padding: 10px; border-radius: 20px; background: #f1f1f1; }
+#message-form button { background: #007bff; color: white; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 20px; cursor: pointer; margin-left: 10px; }
+.hidden { display: none !important; }
