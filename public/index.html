@@ -8,26 +8,35 @@
 </head>
 <body>
     <div id="app">
-        <div class="chat-window">
-            <div id="login-screen">
-                <h2>Masukkan Nama Anda</h2>
-                <input type="text" id="username-input" placeholder="Nama Anda..." autocomplete="off">
-                <button id="join-chat-btn">Gabung Chat</button>
-            </div>
-
-            <div id="chat-screen" class="hidden">
-                <div class="chat-header">
-                    <div id="user-info"></div>
-                    <button id="logout-btn">Logout</button>
-                </div>
-                <div id="messages"></div>
-                <form id="message-form">
-                    <input type="text" id="message-input" placeholder="Ketik pesan..." autocomplete="off" required>
-                    <button type="submit">➤</button>
+        <div id="auth-screen">
+            <div class="auth-container">
+                <h2 id="auth-title">Login</h2>
+                <form id="auth-form">
+                    <input type="email" id="auth-email" placeholder="Email" required>
+                    <input type="password" id="auth-password" placeholder="Password" required>
+                    <p id="auth-error" class="error-message"></p>
+                    <button type="submit" id="auth-submit-btn">Login</button>
                 </form>
+                <p id="auth-toggle-text">Belum punya akun? <a href="#" id="toggle-to-register">Daftar di sini</a></p>
             </div>
         </div>
+
+        <div id="chat-screen" class="hidden">
+            <div class="chat-header">
+                <div id="user-info"></div>
+                <button id="logout-btn">Logout</button>
+            </div>
+            <div id="messages"></div>
+            <form id="message-form">
+                <input type="text" id="message-input" placeholder="Ketik pesan..." autocomplete="off" required>
+                <button type="submit">➤</button>
+            </form>
+        </div>
     </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
+    
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
     <script src="script.js"></script>
 </body>
