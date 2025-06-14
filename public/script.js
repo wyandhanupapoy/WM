@@ -15,6 +15,7 @@ const NETLIFY_FUNCTION_URL = 'https://chatwm.netlify.app/.netlify/functions/send
 
 const GET_HISTORY_URL = 'https://chatwm.netlify.app/.netlify/functions/get-chat-history'; // Ganti dengan URL Netlify yang sesuai
 
+const SEND_MESSAGE_URL = 'https://chatwm.netlify.app/.netlify/functions/send-message'; 
 // =================================================================
 // == AKHIR DARI PENGATURAN WAJIB ==
 // =================================================================
