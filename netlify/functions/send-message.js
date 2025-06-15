@@ -1,9 +1,9 @@
 // File: netlify/functions/send-message.js
+// VERSI FINAL YANG SUDAH BENAR
 
 const Pusher = require('pusher');
 const admin = require('firebase-admin');
 
-// ... (Inisialisasi Firebase & Pusher tetap sama)
 try {
   if (admin.apps.length === 0) {
     admin.initializeApp({
@@ -11,7 +11,7 @@ try {
     });
   }
 } catch (e) {
-  console.error("KRITIS: Gagal inisialisasi Firebase Admin SDK. Periksa FIREBASE_CREDENTIALS.", e);
+  console.error("KRITIS: Gagal inisialisasi Firebase Admin SDK", e);
 }
 
 const pusher = new Pusher({
@@ -25,7 +25,6 @@ const pusher = new Pusher({
 const db = admin.firestore();
 
 exports.handler = async (event) => {
-  // ... (Header CORS dan verifikasi token tetap sama)
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
@@ -42,7 +41,7 @@ exports.handler = async (event) => {
 
   const authHeader = event.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return { statusCode: 401, headers, body: 'Unauthorized: Missing or invalid token' };
+    return { statusCode: 401, headers, body: 'Unauthorized' };
   }
   const idToken = authHeader.split('Bearer ')[1];
 
@@ -50,45 +49,41 @@ exports.handler = async (event) => {
   try {
     decodedToken = await admin.auth().verifyIdToken(idToken);
   } catch (error) {
-    console.error("Error verifikasi token:", error);
-    return { statusCode: 403, headers, body: 'Forbidden: Invalid token' };
+    return { statusCode: 403, headers, body: 'Forbidden' };
   }
   
   const userEmail = decodedToken.email;
 
-  // --- PERBAIKAN DIMULAI DI SINI ---
   try {
-    // Ambil 'message' dan 'imageUrl' dari body request
+    // ✅ MENGAMBIL 'message' DAN 'imageUrl'
     const { message, imageUrl } = JSON.parse(event.body);
 
-    // Buat objek chatMessage yang lengkap
     const chatMessage = {
       username: userEmail,
-      message: message || '', // Pastikan message ada, meski kosong
-      imageUrl: imageUrl || null, // Tambahkan imageUrl
+      message: message || '',
+      imageUrl: imageUrl || null, // ✅ MENYERTAKAN imageUrl
       timestamp: new Date()
     };
     
-    // Simpan dokumen yang sudah lengkap ke Firestore
     const docRef = await db.collection('messages').add(chatMessage);
 
-    // Kirim data yang sudah lengkap (termasuk ID baru) ke Pusher
+    // ✅ MENGIRIM DATA LENGKAP KE PUSHER
     await pusher.trigger('chat-channel', 'new-message', {
-        id: docRef.id, // Sertakan ID dokumen baru
+        id: docRef.id,
         ...chatMessage
     });
 
     return {
       statusCode: 200,
-      headers: headers,
+      headers,
       body: JSON.stringify({ status: 'success', id: docRef.id })
     };
   } catch (error) {
-    console.error("SERVER ERROR saat proses pesan:", error);
+    console.error("SERVER ERROR:", error);
     return {
       statusCode: 500,
-      headers: headers,
-      body: JSON.stringify({ error: 'Failed to process message on server.' })
+      headers,
+      body: JSON.stringify({ error: 'Failed to process message.' })
     };
   }
 };
