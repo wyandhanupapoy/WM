@@ -1,74 +1,54 @@
-
 // File: netlify/functions/delete-message.js
-
-const Pusher = require('pusher');
-const admin = require('firebase-admin');
-
-// (Kode inisialisasi Firebase & Pusher sama seperti di atas)
-try {
-  if (admin.apps.length === 0) {
-    admin.initializeApp({
-      credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_CREDENTIALS))
-    });
-  }
-} catch (e) { console.error("Firebase init error", e); }
-const pusher = new Pusher({
-  appId: process.env.PUSHER_APP_ID,
-  key: process.env.PUSHER_KEY,
-  secret: process.env.PUSHER_SECRET,
-  cluster: process.env.PUSHER_CLUSTER,
-  useTLS: true
-});
+const { initializeFirebaseAdmin, initializePusher } = require('./utils/initialize');
+const admin = initializeFirebaseAdmin();
+const pusher = initializePusher();
 const db = admin.firestore();
 
 exports.handler = async (event) => {
-    // (Kode header CORS & verifikasi token sama seperti di atas)
     const headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         'Access-Control-Allow-Methods': 'POST, OPTIONS'
     };
-    if (event.httpMethod === 'OPTIONS') {
-        return { statusCode: 204, headers, body: '' };
-    }
+    if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers };
+    if (event.httpMethod !== 'POST') return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method Not Allowed' }) };
+
     const authHeader = event.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) { return { statusCode: 401, headers, body: 'Unauthorized' }; }
-    const idToken = authHeader.split('Bearer ')[1];
-    let decodedToken;
-    try {
-        decodedToken = await admin.auth().verifyIdToken(idToken);
-    } catch (error) { return { statusCode: 403, headers, body: 'Forbidden: Invalid token' }; }
-
-    const userEmail = decodedToken.email;
-    const { messageId } = JSON.parse(event.body);
-
-    if (!messageId) {
-        return { statusCode: 400, headers, body: 'Message ID is required' };
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return { statusCode: 401, headers, body: JSON.stringify({ error: 'Unauthorized: Missing token' }) };
     }
+    const idToken = authHeader.split('Bearer ')[1];
 
     try {
+        const decodedToken = await admin.auth().verifyIdToken(idToken);
+        const userEmail = decodedToken.email;
+        const { messageId } = JSON.parse(event.body);
+
+        if (!messageId) {
+            return { statusCode: 400, headers, body: JSON.stringify({ error: 'Message ID is required.' }) };
+        }
+
         const messageRef = db.collection('messages').doc(messageId);
         const messageDoc = await messageRef.get();
 
         if (!messageDoc.exists) {
-            return { statusCode: 404, headers, body: 'Message not found' };
+            return { statusCode: 404, headers, body: JSON.stringify({ error: 'Message not found.' }) };
         }
-
         if (messageDoc.data().username !== userEmail) {
-            return { statusCode: 403, headers, body: 'Forbidden: You can only delete your own messages' };
+            return { statusCode: 403, headers, body: JSON.stringify({ error: 'Forbidden: You can only delete your own messages.' }) };
         }
 
         await messageRef.delete();
 
-        // Beritahu semua klien bahwa pesan telah dihapus
-        await pusher.trigger('chat-channel', 'message-deleted', { 
-            id: messageId,
-            messageId: messageId 
-        });
+        await pusher.trigger('chat-channel', 'message-deleted', { messageId });
 
         return { statusCode: 200, headers, body: JSON.stringify({ status: 'success' }) };
+
     } catch (error) {
-        console.error("SERVER ERROR deleting message:", error);
+        console.error("SERVER ERROR [delete-message]:", error);
+        if (error.code === 'auth/id-token-expired' || error.code === 'auth/argument-error') {
+            return { statusCode: 403, headers, body: JSON.stringify({ error: 'Forbidden: Invalid or expired token.' }) };
+        }
         return { statusCode: 500, headers, body: JSON.stringify({ error: 'Failed to delete message.' }) };
     }
 };
