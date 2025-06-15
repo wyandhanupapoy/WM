@@ -5,469 +5,82 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChatWM</title>
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
     <style>
         /* === FONDASI & TEMA WARNA BARU === */
         :root {
-            /* Warna dari gambar Anda */
-            --theme-dark-blue: #2E4259;
-            --theme-cyan: #25B8C4;
-            --theme-pink: #FF5E8E;
-            --theme-off-white: #F5F5F5;
-
-            /* Penerapan ke elemen UI */
-            --primary-color: var(--theme-dark-blue);
-            --primary-dark: #223142;
-            /* Versi lebih gelap dari biru */
-            --primary-light: #3a5572;
-            /* Versi lebih terang dari biru */
-            --secondary-color: var(--theme-pink);
-            /* Pink untuk tombol aksi */
-            --page-bg: var(--theme-off-white);
-            --app-bg: #FFFFFF;
-            --bubble-own-bg: var(--theme-cyan);
-            --bubble-friend-bg: #E9E9EB;
-
-            --text-light: #FFFFFF;
-            --text-primary-dark: #1f2937;
-            --text-secondary-dark: #6b7280;
-            --error-color: #ef4444;
+            --theme-dark-blue: #2E4259; --theme-cyan: #25B8C4; --theme-pink: #FF5E8E; --theme-off-white: #F5F5F5;
+            --primary-color: var(--theme-dark-blue); --primary-dark: #223142; --primary-light: #3a5572;
+            --secondary-color: var(--theme-pink); --page-bg: var(--theme-off-white); --app-bg: #FFFFFF;
+            --bubble-own-bg: var(--theme-cyan); --bubble-friend-bg: #E9E9EB; --text-light: #FFFFFF;
+            --text-primary-dark: #1f2937; --text-secondary-dark: #6b7280; --error-color: #ef4444;
             --shadow-xl: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-            --radius: 12px;
-            --radius-sm: 8px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --radius: 12px; --radius-sm: 8px; --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        html,
-        body {
-            height: 100%;
-            font-family: 'Inter', sans-serif;
-        }
-
-        body {
-            background-color: var(--page-bg);
-            position: relative;
-        }
-
-        .photo-button {
-            width: 44px;
-            height: 44px;
-            background: #6b7280;
-            border: none;
-            border-radius: 50%;
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            transition: var(--transition);
-        }
-
-        .photo-button:hover {
-            background: #4b5563;
-        }
-
-        .message-bubble img {
-            max-width: 100%;
-            max-height: 300px;
-            border-radius: 8px;
-            margin: 4px 0;
-            cursor: pointer;
-        }
-
-        .image-loading {
-            display: inline-block;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            font-size: 0.9rem;
-            color: #666;
-        }
-
-        #app {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            width: 100%;
-        }
-
-        /* === STRUKTUR RESPONSIVE MOBILE-FIRST (Default untuk semua layar) === */
-        #auth-screen,
-        #chat-screen {
-            width: 100%;
-            height: 100dvh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.3s ease-in-out;
-            background-color: var(--page-bg);
-        }
-
-        .auth-container {
-            width: 90%;
-            max-width: 420px;
-            background: var(--app-bg);
-            border-radius: var(--radius);
-            padding: 2.5rem;
-            box-shadow: var(--shadow-xl);
-            animation: slideInUp 0.6s ease-out;
-        }
-
-        .chat-window {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            background: var(--app-bg);
-        }
-
-        /* === GAYA DESKTOP (Layar > 768px) === */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--page-bg); position: relative; }
+        #app { display: flex; justify-content: center; align-items: center; height: 100%; width: 100%; }
+        #auth-screen, #chat-screen { width: 100%; height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.3s ease-in-out, visibility 0.3s; background-color: var(--page-bg); }
+        .auth-container { width: 90%; max-width: 420px; background: var(--app-bg); border-radius: var(--radius); padding: 2.5rem; box-shadow: var(--shadow-xl); animation: slideInUp 0.6s ease-out; }
+        .chat-window { width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; background: var(--app-bg); }
         @media (min-width: 768px) {
-            #app {
-                padding: 20px;
-            }
-
-            #auth-screen,
-            #chat-screen {
-                height: auto;
-            }
-
-            .chat-window {
-                max-width: 450px;
-                height: 85vh;
-                max-height: 750px;
-                border-radius: var(--radius);
-                box-shadow: var(--shadow-xl);
-            }
+            #app { padding: 20px; }
+            #auth-screen, #chat-screen { height: auto; }
+            .chat-window { max-width: 450px; height: 85vh; max-height: 800px; border-radius: var(--radius); box-shadow: var(--shadow-xl); }
         }
-
-        @keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* === KOMPONEN UI DENGAN TEMA BARU === */
-        .auth-container h2 {
-            color: var(--text-primary-dark);
-            font-size: 2rem;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .input-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 1rem;
-            background: #f3f4f6;
-            border: 1px solid #d1d5db;
-            border-radius: var(--radius-sm);
-            color: var(--text-primary-dark);
-            font-size: 1rem;
-        }
-
-        .input-group input::placeholder {
-            color: var(--text-secondary-dark);
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(46, 66, 89, 0.2);
-        }
-
-        .auth-submit-btn {
-            width: 100%;
-            padding: 1rem;
-            background-color: var(--primary-color);
-            border: none;
-            border-radius: var(--radius-sm);
-            color: var(--text-light);
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            margin-top: 1rem;
-        }
-
-        .auth-submit-btn:hover {
-            background-color: var(--primary-dark);
-        }
-
-        .error-message {
-            color: var(--error-color);
-            font-size: 0.875rem;
-            text-align: center;
-            margin-top: 1rem;
-            min-height: 20px;
-        }
-
-        #auth-toggle-text {
-            text-align: center;
-            margin-top: 2rem;
-            color: var(--text-secondary-dark);
-        }
-
-        #auth-toggle-text a {
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .chat-header {
-            background-color: var(--primary-color);
-            padding: 1rem 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-shrink: 0;
-            color: var(--text-light);
-        }
-
-        #user-info {
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-
-        #logout-btn {
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: var(--text-light);
-            padding: 0.5rem 1rem;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        #logout-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .messages-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1rem;
-            background-color: var(--page-bg);
-            scroll-behavior: smooth;
-        }
-
-        .message-bubble {
-            max-width: 80%;
-            padding: 0.875rem 1rem;
-            border-radius: var(--radius);
-            word-wrap: break-word;
-            background: var(--bubble-friend-bg);
-            border-bottom-left-radius: 4px;
-            color: var(--text-primary-dark);
-            transition: all 0.2s ease;
-            /* Smooth transition untuk perubahan warna */
-        }
-
-        .message-wrapper {
-            display: flex !important;
-            flex-direction: row !important;
-            justify-content: flex-start !important;
-            /* Default kiri */
-        }
-
-        .message-wrapper.own {
-            justify-content: flex-end !important;
-            /* Pesan sendiri kanan */
-        }
-
-        .message-wrapper.own .message-bubble {
-            background: var(--bubble-own-bg);
-            border-bottom-right-radius: 4px;
-            border-bottom-left-radius: var(--radius);
-        }
-
-        .message-bubble .text {
-            line-height: 1.5;
-            font-size: 0.95rem;
-            white-space: pre-wrap;
-        }
-
-        .message-wrapper.own .message-bubble .text {
-            color: var(--text-primary-dark);
-        }
-
-        .message-bubble .time {
-            font-size: 0.75rem;
-            color: var(--text-secondary-dark);
-            text-align: right;
-            display: block;
-            opacity: 0.8;
-            margin-top: 0.25rem;
-        }
-
-        .message-wrapper.own .message-bubble .time {
-            color: #0f4c54;
-        }
-
-        .sender-name {
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-bottom: 0.3rem;
-            opacity: 0.9;
-        }
-
-        .message-wrapper.own .sender-name {
-            display: none;
-        }
-
-        .edited-indicator {
-            font-size: 0.7rem;
-            color: inherit;
-            opacity: 0.6;
-            margin-left: 5px;
-            font-style: italic;
-        }
-
-        .message-wrapper {
-            display: flex;
-            align-items: flex-end;
-            gap: 8px;
-            margin-bottom: 1rem;
-            animation: messageSlideIn 0.3s ease-out;
-        }
-
-        .message-wrapper.own {
-            justify-content: flex-end;
-            flex-direction: row-reverse;
-        }
-
-        .message-actions {
-            display: flex;
-            gap: 4px;
-            margin-bottom: 5px;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s ease-in-out;
-        }
-
-        .message-wrapper:hover .message-actions {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .action-btn {
-            background: rgba(0, 0, 0, 0.05);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            border-radius: 50%;
-            width: 28px;
-            height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-
-        .action-btn:hover {
-            background: rgba(0, 0, 0, 0.1);
-        }
-
-        .action-btn svg {
-            width: 14px;
-            height: 14px;
-            fill: #555;
-        }
-
-        .message-input-area {
-            padding: 1rem;
-            background: #fff;
-            border-top: 1px solid #e5e7eb;
-            flex-shrink: 0;
-        }
-
-        #message-form {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        #message-input {
-            flex: 1;
-            padding: 0.875rem 1rem;
-            background: #f3f4f6;
-            border: 1px solid #d1d5db;
-            border-radius: 25px;
-            color: var(--text-primary-dark);
-            font-size: 1rem;
-        }
-
-        #message-input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-
-        .send-button {
-            width: 44px;
-            height: 44px;
-            background: var(--secondary-color);
-            border: none;
-            border-radius: 50%;
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        @keyframes messageSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+        @keyframes slideInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .auth-container h2 { color: var(--text-primary-dark); font-size: 2rem; font-weight: 700; text-align: center; margin-bottom: 2rem; }
+        .input-group { margin-bottom: 1.5rem; }
+        .input-group input { width: 100%; padding: 1rem; background: #f3f4f6; border: 1px solid #d1d5db; border-radius: var(--radius-sm); color: var(--text-primary-dark); font-size: 1rem; }
+        .input-group input::placeholder { color: var(--text-secondary-dark); }
+        .input-group input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(46, 66, 89, 0.2); }
+        .auth-submit-btn { width: 100%; padding: 1rem; background-color: var(--primary-color); border: none; border-radius: var(--radius-sm); color: var(--text-light); font-size: 1rem; font-weight: 600; cursor: pointer; transition: var(--transition); margin-top: 1rem; }
+        .auth-submit-btn:hover { background-color: var(--primary-dark); }
+        .error-message { color: var(--error-color); font-size: 0.875rem; text-align: center; margin-top: 1rem; min-height: 20px; }
+        #auth-toggle-text { text-align: center; margin-top: 2rem; color: var(--text-secondary-dark); }
+        #auth-toggle-text a { color: var(--primary-color); text-decoration: none; font-weight: 600; cursor: pointer; }
+        .chat-header { background-color: var(--primary-color); padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; color: var(--text-light); }
+        #user-info { font-weight: 600; font-size: 1.1rem; }
+        #logout-btn, #clear-chat-btn { background: transparent; border: 1px solid rgba(255, 255, 255, 0.3); color: var(--text-light); padding: 0.5rem 1rem; border-radius: var(--radius-sm); cursor: pointer; transition: var(--transition); font-weight: 500; }
+        #logout-btn:hover, #clear-chat-btn:hover { background: rgba(255, 255, 255, 0.1); }
+        #clear-chat-btn { margin-right: 10px; background-color: var(--theme-pink); border-color: transparent; }
+        #clear-chat-btn:hover { background-color: #d63068; }
+        #clear-chat-btn:disabled { background-color: #a0a0a0; cursor: not-allowed; }
+        .messages-container { flex: 1; overflow-y: auto; padding: 1rem; background-color: var(--page-bg); scroll-behavior: smooth; }
+        .message-wrapper { display: flex; flex-direction: row; align-items: flex-end; gap: 8px; margin-bottom: 1rem; animation: messageSlideIn 0.3s ease-out; }
+        .message-wrapper.own { justify-content: flex-end; flex-direction: row-reverse; }
+        .message-bubble { max-width: 80%; padding: 0.875rem 1rem; border-radius: var(--radius); word-wrap: break-word; background: var(--bubble-friend-bg); color: var(--text-primary-dark); transition: all 0.2s ease; }
+        .message-wrapper.own .message-bubble { background: var(--bubble-own-bg); border-bottom-right-radius: 4px; border-bottom-left-radius: var(--radius); }
+        .message-bubble .text { line-height: 1.5; font-size: 0.95rem; white-space: pre-wrap; }
+        .message-wrapper.own .message-bubble .text { color: var(--text-primary-dark); }
+        .message-bubble .time { font-size: 0.75rem; text-align: right; display: block; opacity: 0.8; margin-top: 0.25rem; }
+        .message-wrapper.own .message-bubble .time { color: #0f4c54; }
+        .sender-name { font-size: 0.8rem; font-weight: 600; margin-bottom: 0.3rem; opacity: 0.9; }
+        .message-wrapper.own .sender-name { display: none; }
+        .edited-indicator { font-size: 0.7rem; color: inherit; opacity: 0.6; margin-left: 5px; font-style: italic; }
+        .message-actions { display: flex; gap: 4px; margin-bottom: 5px; opacity: 0; pointer-events: none; transition: opacity 0.2s ease-in-out; }
+        .message-wrapper:hover .message-actions { opacity: 1; pointer-events: auto; }
+        .action-btn { background: rgba(0, 0, 0, 0.05); border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .action-btn:hover { background: rgba(0, 0, 0, 0.1); }
+        .action-btn svg { width: 14px; height: 14px; fill: #555; }
+        .message-input-area { padding: 1rem; background: #fff; border-top: 1px solid #e5e7eb; flex-shrink: 0; }
+        #message-form { display: flex; align-items: center; gap: 0.75rem; }
+        #message-input { flex: 1; padding: 0.875rem 1rem; background: #f3f4f6; border: 1px solid #d1d5db; border-radius: 25px; color: var(--text-primary-dark); font-size: 1rem; }
+        #message-input:focus { outline: none; border-color: var(--primary-color); }
+        .photo-button, .send-button { width: 44px; height: 44px; border: none; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: var(--transition); }
+        .photo-button { background: #6b7280; }
+        .photo-button:hover { background: #4b5563; }
+        .send-button { background: var(--secondary-color); }
+        .send-button:hover { background-color: #e64a7e; }
+        .message-bubble img { max-width: 100%; max-height: 300px; border-radius: 8px; margin: 4px 0; cursor: pointer; }
+        .image-loading { display: inline-block; padding: 10px; background: rgba(0, 0, 0, 0.1); border-radius: 8px; font-size: 0.9rem; color: #666; }
+        .hidden { display: none !important; }
+        .loading { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top-color: white; animation: spin 1s ease-in-out infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes messageSlideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 
@@ -476,13 +89,12 @@
         <div id="auth-screen">
             <div class="auth-container">
                 <h2 id="auth-title">Login</h2>
-                <form id="auth-form">
+                <form id="auth-form" novalidate>
                     <div class="input-group">
                         <input type="email" id="auth-email" placeholder="Email" required autocomplete="email">
                     </div>
                     <div class="input-group">
-                        <input type="password" id="auth-password" placeholder="Password" required
-                            autocomplete="current-password">
+                        <input type="password" id="auth-password" placeholder="Password" required autocomplete="current-password">
                     </div>
                     <p id="auth-error" class="error-message"></p>
                     <button type="submit" id="auth-submit-btn" class="auth-submit-btn">Login</button>
@@ -491,39 +103,28 @@
             </div>
         </div>
 
-        <div class="chat-header">
-            <div id="user-info"></div>
-            <div>
-                <button id="clear-chat-btn" class="hidden" style="margin-right: 10px;">Hapus Semua Chat</button>
-                <button id="logout-btn">Logout</button>
-            </div>
-        </div>
-
         <div id="chat-screen" class="hidden">
             <div class="chat-window">
                 <div class="chat-header">
                     <div id="user-info"></div>
-                    <button id="logout-btn">Logout</button>
+                    <div>
+                        <button id="clear-chat-btn" class="hidden">Hapus Semua Chat</button>
+                        <button id="logout-btn">Logout</button>
+                    </div>
                 </div>
                 <div id="messages" class="messages-container"></div>
                 <div class="message-input-area">
-                    <!-- Di message-input-area, ganti form dengan: -->
                     <form id="message-form">
-                        <input type="file" id="photo-input" accept="image/*" style="display: none;">
+                        <input type="file" id="photo-input" accept="image/*" class="hidden">
                         <button type="button" id="photo-btn" class="photo-button" aria-label="Kirim Foto">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20"
-                                height="20">
-                                <path fill-rule="evenodd"
-                                    d="M1.5 6a2.25 2.25 0 0 1 2.25-2.25h16.5A2.25 2.25 0 0 1 22.5 6v12a2.25 2.25 0 0 1-2.25 2.25H3.75A2.25 2.25 0 0 1 1.5 18V6ZM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0 0 21 18v-1.94l-2.69-2.689a1.5 1.5 0 0 0-2.12 0l-.88.879.97.97a.75.75 0 1 1-1.06 1.061l-5.16-5.159a1.5 1.5 0 0 0-2.12 0L3 16.061Zm10.125-7.81a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Z"
-                                    clip-rule="evenodd" />
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                                <path fill-rule="evenodd" d="M1.5 6a2.25 2.25 0 0 1 2.25-2.25h16.5A2.25 2.25 0 0 1 22.5 6v12a2.25 2.25 0 0 1-2.25 2.25H3.75A2.25 2.25 0 0 1 1.5 18V6ZM3 16.06V18c0 .414.336.75.75.75h16.5a.75.75 0 0 0 21-18v-1.94l-2.69-2.689a1.5 1.5 0 0 0-2.12 0l-.88.879.97.97a.75.75 0 1 1-1.06 1.061l-5.16-5.159a1.5 1.5 0 0 0-2.12 0L3 16.061Zm10.125-7.81a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Z" clip-rule="evenodd" />
                             </svg>
                         </button>
                         <input type="text" id="message-input" placeholder="Ketik pesan..." autocomplete="off">
                         <button type="submit" class="send-button" aria-label="Kirim Pesan">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20"
-                                height="20">
-                                <path
-                                    d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                                <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
                             </svg>
                         </button>
                     </form>
@@ -532,330 +133,485 @@
         </div>
     </div>
 
-    <!-- SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+
             // ===================================================================
             // KONFIGURASI APLIKASI
             // ===================================================================
-            const firebaseConfig = {
-                apiKey: "AIzaSyAdNwK-04FA4fxOEZQ2FDWpjzRYv4SG6zA",
-                authDomain: "chat-wm-database.firebaseapp.com",
-                projectId: "chat-wm-database",
-                storageBucket: "chat-wm-database.appspot.com",
-                messagingSenderId: "159386402313",
-                appId: "1:159386402313:web:e7bba7e53123c88fad82d8"
+            const Config = {
+                firebase: {
+                    apiKey: "AIzaSyAdNwK-04FA4fxOEZQ2FDWpjzRYv4SG6zA",
+                    authDomain: "chat-wm-database.firebaseapp.com",
+                    projectId: "chat-wm-database",
+                    storageBucket: "chat-wm-database.appspot.com",
+                    messagingSenderId: "159386402313",
+                    appId: "1:159386402313:web:e7bba7e53123c88fad82d8"
+                },
+                cloudinary: {
+                    cloudName: 'dzoxyqyrl',
+                    uploadPreset: 'chat_unsigned'
+                },
+                pusher: {
+                    key: '5c82ec0166360a9e296b',
+                    cluster: 'ap1',
+                    channel: 'chat-channel'
+                },
+                api: {
+                    baseUrl: 'https://chatwm.netlify.app/.netlify/functions',
+                    endpoints: {
+                        sendMessage: '/send-message',
+                        getHistory: '/get-chat-history',
+                        deleteMessage: '/delete-message',
+                        editMessage: '/edit-message',
+                        clearChat: '/delete-all-messages'
+                    }
+                },
+                colors: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57', '#FF9FF3', '#54A0FF', '#5F27CD', '#00D2D3', '#FF9F43', '#10AC84', '#EE5A24', '#0652DD', '#9C88FF', '#FFC312', '#C4E538', '#12CBC4', '#FDA7DF', '#ED4C67', '#F79F1F']
             };
 
-            const CLOUDINARY_CLOUD_NAME = 'dzoxyqyrl';
-            const CLOUDINARY_UPLOAD_PRESET = 'chat_unsigned';
+            // ===================================================================
+            // STATE APLIKASI
+            // ===================================================================
+            const State = {
+                currentUser: null,
+                isCurrentUserAdmin: false,
+                isLoginMode: true,
+                isEditingMessageId: null,
+            };
 
-            const PUSHER_KEY = '5c82ec0166360a9e296b';
-            const PUSHER_CLUSTER = 'ap1';
+            // ===================================================================
+            // ELEMEN DOM
+            // ===================================================================
+            const UI = {
+                authScreen: document.getElementById('auth-screen'),
+                chatScreen: document.getElementById('chat-screen'),
+                authForm: document.getElementById('auth-form'),
+                authEmailInput: document.getElementById('auth-email'),
+                authPasswordInput: document.getElementById('auth-password'),
+                authError: document.getElementById('auth-error'),
+                authSubmitBtn: document.getElementById('auth-submit-btn'),
+                authTitle: document.getElementById('auth-title'),
+                authToggleLink: document.querySelector('#auth-toggle-text a'),
+                userInfo: document.getElementById('user-info'),
+                logoutBtn: document.getElementById('logout-btn'),
+                clearChatBtn: document.getElementById('clear-chat-btn'),
+                messagesContainer: document.getElementById('messages'),
+                messageForm: document.getElementById('message-form'),
+                messageInput: document.getElementById('message-input'),
+                photoBtn: document.getElementById('photo-btn'),
+                photoInput: document.getElementById('photo-input'),
+            };
 
-            const BASE_URL = 'https://chatwm.netlify.app/.netlify/functions';
-            const SEND_MESSAGE_URL = `${BASE_URL}/send-message`;
-            const GET_HISTORY_URL = `${BASE_URL}/get-chat-history`;
-            const DELETE_MESSAGE_URL = `${BASE_URL}/delete-message`;
-            const EDIT_MESSAGE_URL = `${BASE_URL}/edit-message`;
-
-            // 1. Tambahkan variabel URL baru di bagian konfigurasi
-const CLEAR_CHAT_URL = `${BASE_URL}/delete-all-messages`;
-
-// 2. Tambahkan variabel elemen DOM baru
-const clearChatBtn = document.getElementById('clear-chat-btn');
-let isCurrentUserAdmin = false;
-
-// 3. Perbarui fungsi auth.onAuthStateChanged
-auth.onAuthStateChanged(async (user) => {
-    if (user) {
-        currentUser = user;
-
-        // ✅ Cek status admin pengguna
-        const tokenResult = await user.getIdTokenResult();
-        isCurrentUserAdmin = tokenResult.claims.admin === true;
-
-        // Tampilkan tombol admin jika pengguna adalah admin
-        clearChatBtn.classList.toggle('hidden', !isCurrentUserAdmin);
-
-        // ... sisa kode onAuthStateChanged tetap sama ...
-        authScreen.classList.add('hidden');
-        chatScreen.classList.remove('hidden');
-        userInfo.textContent = user.email;
-        await fetchChatHistory();
-    } else {
-        currentUser = null;
-        isCurrentUserAdmin = false;
-        // ... sisa kode else tetap sama ...
-        authScreen.classList.remove('hidden');
-        chatScreen.classList.add('hidden');
-        clearChatBtn.classList.add('hidden');
-    }
-});
-
-// 4. Tambahkan Event Listener baru untuk tombol admin
-clearChatBtn.addEventListener('click', async () => {
-    if (!isCurrentUserAdmin) return;
-
-    const confirmation = prompt('Ini akan menghapus SEMUA pesan untuk SEMUA pengguna secara permanen. Ketik "HAPUS" untuk konfirmasi.');
-    if (confirmation !== 'HAPUS') {
-        alert('Penghapusan dibatalkan.');
-        return;
-    }
-
-    try {
-        clearChatBtn.disabled = true;
-        clearChatBtn.textContent = 'Menghapus...';
-        await fetchWithAuth(CLEAR_CHAT_URL, { method: 'POST' });
-        // Notifikasi berhasil akan datang dari Pusher
-    } catch (error) {
-        alert('Gagal menghapus chat: ' + error.message);
-    } finally {
-        clearChatBtn.disabled = false;
-        clearChatBtn.textContent = 'Hapus Semua Chat';
-    }
-});
-
-// 5. Tambahkan Event Listener baru untuk Pusher
-channel.bind('chat-cleared', () => {
-    console.log('Menerima event chat-cleared. Membersihkan UI...');
-    messagesContainer.innerHTML = '<p style="text-align:center;color:var(--text-secondary-dark);">Riwayat chat telah dibersihkan oleh admin.</p>';
-});
-
-            // Array warna-warni yang bagus untuk bubble chat
-            const userColors = [
-                '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57',
-                '#FF9FF3', '#54A0FF', '#5F27CD', '#00D2D3', '#FF9F43',
-                '#10AC84', '#EE5A24', '#0652DD', '#9C88FF', '#FFC312',
-                '#C4E538', '#12CBC4', '#FDA7DF', '#ED4C67', '#F79F1F'
-            ];
-
-            /**
-             * Menghasilkan warna yang konsisten berdasarkan nama pengguna.
-             * @param {string} username - Email atau nama pengguna.
-             * @returns {string} Kode warna heksadesimal.
-             */
-            function getUserColor(username) {
-                if (!username) return 'var(--bubble-friend-bg)'; // Warna default jika tidak ada username
-
-                // Hash sederhana untuk mengubah string menjadi angka
-                let hash = 0;
-                for (let i = 0; i < username.length; i++) {
-                    hash = username.charCodeAt(i) + ((hash << 5) - hash);
-                }
-
-                // Ambil warna dari palet berdasarkan hash
-                const colorIndex = Math.abs(hash) % userColors.length;
-                return userColors[colorIndex];
-            }
-
-            /**
-             * Menentukan warna teks (hitam/putih) yang paling kontras dengan warna latar.
-             * @param {string} bgColor - Kode warna heksadesimal dari latar.
-             * @returns {string} Warna '#1f2937' (gelap) atau '#ffffff' (terang).
-             */
-            function getContrastTextColor(bgColor) {
-                if (bgColor.startsWith('var(')) return 'var(--text-primary-dark)'; // Teks default untuk warna variabel CSS
-
-                const hex = bgColor.replace('#', '');
-                const r = parseInt(hex.substr(0, 2), 16);
-                const g = parseInt(hex.substr(2, 2), 16);
-                const b = parseInt(hex.substr(4, 2), 16);
-                const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-
-                return luminance > 0.6 ? '#1f2937' : '#ffffff';
-            }
-
-            // --- Inisialisasi Layanan ---
-            firebase.initializeApp(firebaseConfig);
+            // ===================================================================
+            // INISIALISASI LAYANAN
+            // ===================================================================
+            firebase.initializeApp(Config.firebase);
             const auth = firebase.auth();
-            const pusher = new Pusher(PUSHER_KEY, { cluster: PUSHER_CLUSTER });
-            const channel = pusher.subscribe('chat-channel');
-
-            // --- Elemen DOM & Variabel State ---
-            let currentUser = null;
-            let isLoginMode = true;
-            const authScreen = document.getElementById('auth-screen');
-            const chatScreen = document.getElementById('chat-screen');
-            const authForm = document.getElementById('auth-form');
-            const authEmailInput = document.getElementById('auth-email');
-            const authPasswordInput = document.getElementById('auth-password');
-            const authError = document.getElementById('auth-error');
-            const authSubmitBtn = document.getElementById('auth-submit-btn');
-            const authTitle = document.getElementById('auth-title');
-            const authToggleText = document.getElementById('auth-toggle-text');
-            const userInfo = document.getElementById('user-info');
-            const logoutBtn = document.getElementById('logout-btn');
-            const messagesContainer = document.getElementById('messages');
-            const messageForm = document.getElementById('message-form');
-            const messageInput = document.getElementById('message-input');
-            const photoBtn = document.getElementById('photo-btn');
-            const photoInput = document.getElementById('photo-input');
+            const pusher = new Pusher(Config.pusher.key, { cluster: Config.pusher.cluster });
+            const channel = pusher.subscribe(Config.pusher.channel);
 
             // ===================================================================
-            // FUNGSI-FUNGSI UTAMA
+            // FUNGSI UTILITY
             // ===================================================================
+            const Utils = {
+                getUserColor(username) {
+                    if (!username) return 'var(--bubble-friend-bg)';
+                    let hash = 0;
+                    for (let i = 0; i < username.length; i++) {
+                        hash = username.charCodeAt(i) + ((hash << 5) - hash);
+                    }
+                    return Config.colors[Math.abs(hash) % Config.colors.length];
+                },
+                getContrastTextColor(bgColor) {
+                    if (bgColor.startsWith('var(')) return 'var(--text-primary-dark)';
+                    const hex = bgColor.replace('#', '');
+                    const [r, g, b] = [0, 2, 4].map(p => parseInt(hex.substr(p, 2), 16));
+                    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+                    return luminance > 0.6 ? '#1f2937' : '#ffffff';
+                },
+                resizeImage(file, maxWidth = 800, quality = 0.8) {
+                    return new Promise((resolve, reject) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            const ctx = canvas.getContext('2d');
+                            const ratio = Math.min(maxWidth / img.width, 1);
+                            canvas.width = img.width * ratio;
+                            canvas.height = img.height * ratio;
+                            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                            canvas.toBlob(blob => {
+                                if (blob) {
+                                    blob.name = file.name;
+                                    resolve(blob);
+                                } else {
+                                    reject(new Error('Gagal membuat blob dari canvas.'));
+                                }
+                            }, 'image/jpeg', quality);
+                        };
+                        img.onerror = () => reject(new Error('Gagal memuat gambar.'));
+                        img.src = URL.createObjectURL(file);
+                    });
+                },
+                sanitizeHTML(str) {
+                    return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                }
+            };
+            
+            // ===================================================================
+            // MODUL API
+            // ===================================================================
+            const Api = {
+                async fetchWithAuth(endpoint, options = {}) {
+                    if (!State.currentUser) throw new Error("Pengguna belum login.");
+                    const idToken = await State.currentUser.getIdToken(true);
+                    const url = `${Config.api.baseUrl}${endpoint}`;
+                    const headers = {
+                        ...options.headers,
+                        'Authorization': `Bearer ${idToken}`,
+                        'Content-Type': 'application/json'
+                    };
+                    const response = await fetch(url, { ...options, headers });
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({ error: response.statusText }));
+                        throw new Error(errorData.error || `Request gagal dengan status ${response.status}`);
+                    }
+                    return response;
+                },
 
-            async function uploadImageToCloudinary(file) {
-                const formData = new FormData();
-                formData.append('file', file);
-                formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-                const apiUrl = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
-                console.log('Mengunggah ke Cloudinary...');
-                try {
-                    const response = await fetch(apiUrl, { method: 'POST', body: formData });
+                async getChatHistory() {
+                    const response = await this.fetchWithAuth(Config.api.endpoints.getHistory);
+                    return await response.json();
+                },
+                
+                async sendMessage(message, imageUrl = null) {
+                    return this.fetchWithAuth(Config.api.endpoints.sendMessage, {
+                        method: 'POST',
+                        body: JSON.stringify({ message, imageUrl })
+                    });
+                },
+
+                async deleteMessage(messageId) {
+                    return this.fetchWithAuth(Config.api.endpoints.deleteMessage, {
+                        method: 'POST',
+                        body: JSON.stringify({ messageId })
+                    });
+                },
+
+                async editMessage(messageId, newText) {
+                    return this.fetchWithAuth(Config.api.endpoints.editMessage, {
+                        method: 'POST',
+                        body: JSON.stringify({ messageId, newText })
+                    });
+                },
+
+                async clearAllMessages() {
+                    return this.fetchWithAuth(Config.api.endpoints.clearChat, { method: 'POST' });
+                },
+
+                async uploadImage(file) {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('upload_preset', Config.cloudinary.uploadPreset);
+                    const url = `https://api.cloudinary.com/v1_1/${Config.cloudinary.cloudName}/image/upload`;
+                    const response = await fetch(url, { method: 'POST', body: formData });
                     if (!response.ok) {
                         const errorData = await response.json();
                         throw new Error(`Cloudinary Error: ${errorData.error.message}`);
                     }
                     const result = await response.json();
-                    console.log('Upload Cloudinary berhasil. URL:', result.secure_url);
                     return result.secure_url;
-                } catch (error) {
-                    console.error('Gagal unggah ke Cloudinary:', error);
-                    throw new Error('Gagal mengunggah gambar: ' + error.message);
                 }
-            }
+            };
 
-            function resizeImage(file, maxWidth = 800, quality = 0.8) {
-                return new Promise((resolve) => {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    const img = new Image();
-                    img.onload = () => {
-                        const ratio = Math.min(maxWidth / img.width, 1);
-                        canvas.width = img.width * ratio;
-                        canvas.height = img.height * ratio;
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        canvas.toBlob((blob) => {
-                            blob.name = file.name;
-                            resolve(blob);
-                        }, 'image/jpeg', quality);
-                    };
-                    img.src = URL.createObjectURL(file);
-                });
-            }
+            // ===================================================================
+            // MODUL CHAT UI
+            // ===================================================================
+            const ChatUI = {
+                displayMessage(data) {
+                    if (!data || (!data.message && !data.imageUrl)) return;
 
-            function displayMessage(data) {
-                // Hentikan jika tidak ada data atau konten yang bisa ditampilkan
-                if (!data || (!data.message && !data.imageUrl)) return;
+                    const isUpdate = !!document.querySelector(`.message-wrapper[data-id="${data.id}"]`);
+                    let messageWrapper = isUpdate ? document.querySelector(`.message-wrapper[data-id="${data.id}"]`) : document.createElement('div');
 
-                const isNewMessage = !document.querySelector(`[data-id="${data.id}"]`);
-                let messageWrapper = isNewMessage ? document.createElement('div') : document.querySelector(`[data-id="${data.id}"]`);
+                    if (!isUpdate) {
+                        messageWrapper.className = 'message-wrapper';
+                        messageWrapper.dataset.id = data.id;
+                    }
 
-                if (isNewMessage) {
-                    messageWrapper.classList.add('message-wrapper');
-                    messageWrapper.dataset.id = data.id;
-                }
+                    const isOwn = State.currentUser && data.username === State.currentUser.email;
+                    messageWrapper.classList.toggle('own', isOwn);
 
-                const isOwnMessage = currentUser && data.username === currentUser.email;
-                messageWrapper.classList.toggle('own', isOwnMessage);
+                    const bubbleColor = isOwn ? 'var(--bubble-own-bg)' : Utils.getUserColor(data.username);
+                    const textColor = isOwn ? 'var(--text-primary-dark)' : Utils.getContrastTextColor(bubbleColor);
 
-                // --- LOGIKA PEWARNAAN DINAMIS ---
-                let bubbleColor, textColor;
-                if (isOwnMessage) {
-                    // Pesan Anda sendiri menggunakan warna default dari CSS
-                    bubbleColor = 'var(--bubble-own-bg)';
-                    textColor = 'var(--text-primary-dark)'; // Teks gelap untuk bubble cyan
-                } else {
-                    // Pesan pengguna lain mendapatkan warna unik
-                    bubbleColor = getUserColor(data.username);
-                    textColor = getContrastTextColor(bubbleColor);
-                }
+                    const time = new Date(data.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                    const editedIndicator = data.isEdited ? '<span class="edited-indicator">(diubah)</span>' : '';
+                    const messageText = data.message || '';
+                    
+                    let imageHTML = '';
+                    if (data.imageUrl) {
+                        imageHTML = `<img src="${data.imageUrl}" alt="Foto dari ${data.username}" onclick="window.open('${data.imageUrl}', '_blank')">`;
+                    }
+                    
+                    const textHTML = messageText ? `<div class="text">${Utils.sanitizeHTML(messageText)}</div>` : '';
+                    const senderNameHTML = !isOwn ? `<div class="sender-name" style="color: ${bubbleColor};">${data.username}</div>` : '';
 
-                // Format data lainnya
-                const dateObject = new Date(data.timestamp);
-                const time = !isNaN(dateObject) ? dateObject.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '';
-                const editedIndicator = data.isEdited ? '<span class="edited-indicator">(diubah)</span>' : '';
-                const messageText = data.newText || data.message || '';
-                const sanitizedMessage = messageText.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    const editButton = isOwn && !data.imageUrl ? `<button class="action-btn edit-btn" title="Edit"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"><path d="M13.488 2.513a1.75 1.75 0 0 0-2.475 0L3.75 9.775V12.25h2.475l7.263-7.262a1.75 1.75 0 0 0 0-2.475Z" /><path d="M14.25 8.755a.75.75 0 0 1-.75.75H8.75a.75.75 0 0 1 0-1.5h4.75a.75.75 0 0 1 .75.75Z" /></svg></button>` : '';
+                    const deleteButton = isOwn ? `<button class="action-btn delete-btn" title="Hapus"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M5 3.25V4H2.75a.75.75 0 0 0 0 1.5h.3l.815 8.15A1.5 1.5 0 0 0 5.357 15h5.285a1.5 1.5 0 0 0 1.493-1.35l.815-8.15h.3a.75.75 0 0 0 0-1.5H11v-.75A2.25 2.25 0 0 0 8.75 1h-1.5A2.25 2.25 0 0 0 5 3.25Zm2.25-.75a.75.75 0 0 0-.75.75V4h3v-.75a.75.75 0 0 0-.75-.75h-1.5Z" clip-rule="evenodd" /></svg></button>` : '';
 
-                // Buat konten HTML untuk bubble
-                let messageContent = '';
-                if (data.imageUrl) {
-                    messageContent += `<img src="${data.imageUrl}" alt="Foto dari ${data.username}" onclick="window.open('${data.imageUrl}', '_blank')">`;
-                }
-                if (sanitizedMessage) {
-                    messageContent += `<div class="text">${sanitizedMessage}</div>`;
-                }
+                    messageWrapper.innerHTML = `
+                        <div class="message-actions">${editButton}${deleteButton}</div>
+                        <div class="message-bubble" style="background-color: ${bubbleColor}; color: ${textColor};">
+                            ${senderNameHTML}
+                            ${imageHTML}
+                            ${textHTML}
+                            <span class="time" style="color: ${textColor}; opacity: 0.7;">${time}${editedIndicator}</span>
+                        </div>`;
 
-                const senderNameHTML = !isOwnMessage ? `<div class="sender-name" style="color: ${bubbleColor};">${data.username}</div>` : '';
+                    if (!isUpdate) {
+                        UI.messagesContainer.appendChild(messageWrapper);
+                    }
+                    
+                    // Auto-scroll logic
+                    const isScrolledToBottom = UI.messagesContainer.scrollHeight - UI.messagesContainer.scrollTop <= UI.messagesContainer.clientHeight + 100;
+                    if (isOwn || isScrolledToBottom) {
+                        UI.messagesContainer.scrollTop = UI.messagesContainer.scrollHeight;
+                    }
+                },
+                
+                updateMessage(data) {
+                    const messageWrapper = document.querySelector(`.message-wrapper[data-id="${data.id}"]`);
+                    if (!messageWrapper) return;
+                    
+                    // Re-render the message with updated content
+                    // For simplicity, we just call displayMessage again which handles updates
+                    this.displayMessage({
+                        ...data,
+                        message: data.newText, // Use newText from edit event
+                        isEdited: true
+                    });
+                },
 
-                // Gabungkan semuanya menjadi HTML akhir untuk message wrapper
-                messageWrapper.innerHTML = `
-                    <div class="message-actions">
-                         ${isOwnMessage && !data.imageUrl ? `<button class="action-btn edit-btn" title="Edit">...</button>` : ''}
-                         ${isOwnMessage ? `<button class="action-btn delete-btn" title="Hapus">...</button>` : ''}
-                    </div>
-                    <div class="message-bubble" style="background-color: ${bubbleColor}; color: ${textColor};">
-                        ${senderNameHTML}
-                        ${messageContent}
-                        <span class="time" style="color: ${textColor}; opacity: 0.7;">${time}${editedIndicator}</span>
-                    </div>`;
+                removeMessage(messageId) {
+                    const el = document.querySelector(`.message-wrapper[data-id="${messageId}"]`);
+                    if (el) {
+                        el.style.opacity = '0';
+                        el.style.transform = 'scale(0.8)';
+                        setTimeout(() => el.remove(), 300);
+                    }
+                },
 
-                // Tambahkan elemen baru ke container chat
-                if (isNewMessage) {
-                    messagesContainer.appendChild(messageWrapper);
-                    // Otomatis scroll ke bawah
-                    if (isOwnMessage || messagesContainer.scrollHeight - messagesContainer.scrollTop < messagesContainer.clientHeight + 200) {
-                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                clearAllMessagesUI() {
+                    UI.messagesContainer.innerHTML = `<p style="text-align:center;color:var(--text-secondary-dark);padding:2rem;">Riwayat chat telah dibersihkan oleh admin.</p>`;
+                },
+
+                async populateChatHistory() {
+                    try {
+                        const history = await Api.getChatHistory();
+                        UI.messagesContainer.innerHTML = '';
+                        if (Array.isArray(history)) {
+                            history.forEach(this.displayMessage);
+                        }
+                        UI.messagesContainer.scrollTop = UI.messagesContainer.scrollHeight;
+                    } catch (error) {
+                        console.error('Gagal mengambil riwayat chat:', error);
+                        UI.messagesContainer.innerHTML = `<p style="text-align:center;color:var(--error-color);">Gagal memuat riwayat chat.</p>`;
                     }
                 }
-            }
+            };
+            
+            // ===================================================================
+            // MODUL AUTENTIKASI
+            // ===================================================================
+            const AuthModule = {
+                async handleAuthChange(user) {
+                    if (user) {
+                        State.currentUser = user;
+                        const tokenResult = await user.getIdTokenResult();
+                        State.isCurrentUserAdmin = tokenResult.claims.admin === true;
 
-            async function fetchWithAuth(url, options = {}) {
-                if (!currentUser) throw new Error("Pengguna belum login");
-                const idToken = await currentUser.getIdToken(true);
-                const headers = { ...options.headers, 'Authorization': `Bearer ${idToken}`, 'Content-Type': 'application/json' };
-                return fetch(url, { ...options, headers });
-            }
+                        UI.authScreen.classList.add('hidden');
+                        UI.chatScreen.classList.remove('hidden');
+                        UI.userInfo.textContent = user.email;
+                        UI.clearChatBtn.classList.toggle('hidden', !State.isCurrentUserAdmin);
 
-            async function fetchChatHistory() {
+                        await ChatUI.populateChatHistory();
+                    } else {
+                        State.currentUser = null;
+                        State.isCurrentUserAdmin = false;
+                        
+                        UI.authScreen.classList.remove('hidden');
+                        UI.chatScreen.classList.add('hidden');
+                        UI.clearChatBtn.classList.add('hidden');
+                        UI.messagesContainer.innerHTML = ''; // Clear chat on logout
+                    }
+                },
+                
+                toggleAuthMode() {
+                    State.isLoginMode = !State.isLoginMode;
+                    UI.authTitle.textContent = State.isLoginMode ? 'Login' : 'Daftar';
+                    UI.authSubmitBtn.textContent = State.isLoginMode ? 'Login' : 'Daftar';
+                    UI.authToggleLink.textContent = State.isLoginMode ? 'Daftar di sini' : 'Login di sini';
+                    UI.authError.textContent = '';
+                    UI.authForm.reset();
+                },
+
+                async handleSubmit(e) {
+                    e.preventDefault();
+                    const email = UI.authEmailInput.value.trim();
+                    const password = UI.authPasswordInput.value;
+                    UI.authError.textContent = '';
+                    UI.authSubmitBtn.disabled = true;
+                    UI.authSubmitBtn.innerHTML = '<span class="loading"></span>';
+
+                    try {
+                        if (State.isLoginMode) {
+                            await auth.signInWithEmailAndPassword(email, password);
+                        } else {
+                            await auth.createUserWithEmailAndPassword(email, password);
+                        }
+                    } catch (error) {
+                        UI.authError.textContent = error.message;
+                    } finally {
+                        UI.authSubmitBtn.disabled = false;
+                        UI.authSubmitBtn.textContent = State.isLoginMode ? 'Login' : 'Daftar';
+                    }
+                }
+            };
+
+            // ===================================================================
+            // EVENT LISTENERS
+            // ===================================================================
+            auth.onAuthStateChanged(AuthModule.handleAuthChange);
+            UI.authForm.addEventListener('submit', AuthModule.handleSubmit);
+            UI.authToggleLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                AuthModule.toggleAuthMode();
+            });
+            UI.logoutBtn.addEventListener('click', () => auth.signOut());
+
+            // --- Listener untuk form pengiriman pesan ---
+            UI.messageForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const text = UI.messageInput.value.trim();
+                if (!text && !State.isEditingMessageId) return;
+
+                UI.messageInput.disabled = true;
+
                 try {
-                    const response = await fetchWithAuth(GET_HISTORY_URL);
-                    if (!response.ok) throw new Error(`Server error: ${response.status}`);
-                    const history = await response.json();
-                    messagesContainer.innerHTML = '';
-                    if (Array.isArray(history)) history.forEach(displayMessage);
-                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    if (State.isEditingMessageId) {
+                        await Api.editMessage(State.isEditingMessageId, text);
+                        State.isEditingMessageId = null;
+                        UI.messageInput.style.backgroundColor = '#f3f4f6';
+                    } else {
+                        await Api.sendMessage(text);
+                    }
+                    UI.messageForm.reset();
                 } catch (error) {
-                    console.error('Gagal mengambil riwayat chat:', error);
-                }
-            }
-
-            function showNotification(title, body) { /* ... fungsi notifikasi ... */ }
-
-            // --- EVENT LISTENERS ---
-            auth.onAuthStateChanged(async user => {
-                currentUser = user;
-                authScreen.classList.toggle('hidden', user);
-                chatScreen.classList.toggle('hidden', !user);
-                if (user) {
-                    userInfo.textContent = user.email;
-                    await fetchChatHistory();
+                    console.error("Gagal mengirim/mengedit pesan:", error);
+                    alert("Gagal mengirim pesan. Silakan coba lagi.");
+                } finally {
+                    UI.messageInput.disabled = false;
+                    UI.messageInput.focus();
                 }
             });
 
-            messageForm.addEventListener('submit', async e => { /* ... (sama) ... */ });
-            photoBtn.addEventListener('click', () => photoInput.click());
-            photoInput.addEventListener('change', async e => { /* ... (sama, memanggil uploadImageToCloudinary) ... */ });
-            messagesContainer.addEventListener('click', async e => { /* ... (sama) ... */ });
-            logoutBtn.addEventListener('click', () => auth.signOut());
-            authToggleText.addEventListener('click', e => { /* ... (sama) ... */ });
+            // --- Listener untuk tombol & input foto ---
+            UI.photoBtn.addEventListener('click', () => UI.photoInput.click());
+            UI.photoInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
 
-            // --- PUSHER BINDINGS ---
-            channel.bind('new-message', displayMessage);
-            channel.bind('message-deleted', data => {
-                const el = document.querySelector(`[data-id="${data.messageId}"]`);
-                if (el) el.remove();
+                // Reset input agar bisa memilih file yang sama lagi
+                UI.photoInput.value = ''; 
+                
+                alert('Mengunggah gambar...');
+                try {
+                    const resizedFile = await Utils.resizeImage(file);
+                    const imageUrl = await Api.uploadImage(resizedFile);
+                    await Api.sendMessage(null, imageUrl);
+                } catch (error) {
+                    console.error("Gagal mengunggah gambar:", error);
+                    alert(`Gagal mengunggah gambar: ${error.message}`);
+                }
             });
-            channel.bind('message-edited', data => { /* ... (sama) ... */ });
+
+            // --- Listener untuk aksi pada pesan (delete/edit) ---
+            UI.messagesContainer.addEventListener('click', async (e) => {
+                const editBtn = e.target.closest('.edit-btn');
+                const deleteBtn = e.target.closest('.delete-btn');
+                const messageWrapper = e.target.closest('.message-wrapper');
+                
+                if (!messageWrapper) return;
+                const messageId = messageWrapper.dataset.id;
+
+                if (editBtn) {
+                    const textEl = messageWrapper.querySelector('.text');
+                    if (!textEl) return;
+                    UI.messageInput.value = textEl.textContent;
+                    UI.messageInput.focus();
+                    UI.messageInput.style.backgroundColor = '#fff8e1';
+                    State.isEditingMessageId = messageId;
+                }
+
+                if (deleteBtn) {
+                    if (confirm('Apakah Anda yakin ingin menghapus pesan ini?')) {
+                        try {
+                            await Api.deleteMessage(messageId);
+                        } catch (error) {
+                            console.error('Gagal menghapus pesan:', error);
+                            alert(`Gagal menghapus pesan: ${error.message}`);
+                        }
+                    }
+                }
+            });
+            
+            // --- Listener untuk tombol Hapus Semua Chat (Admin) ---
+            UI.clearChatBtn.addEventListener('click', async () => {
+                if (!State.isCurrentUserAdmin) return;
+                
+                const confirmation = prompt('Ini akan menghapus SEMUA pesan untuk SEMUA pengguna secara permanen. Ketik "HAPUS" untuk konfirmasi.');
+                if (confirmation !== 'HAPUS') {
+                    alert('Penghapusan dibatalkan.');
+                    return;
+                }
+
+                UI.clearChatBtn.disabled = true;
+                UI.clearChatBtn.textContent = 'Menghapus...';
+                try {
+                    await Api.clearAllMessages();
+                    // UI akan diperbarui via Pusher event
+                } catch (error) {
+                    alert('Gagal menghapus chat: ' + error.message);
+                } finally {
+                    UI.clearChatBtn.disabled = false;
+                    UI.clearChatBtn.textContent = 'Hapus Semua Chat';
+                }
+            });
+
+            // ===================================================================
+            // PUSHER BINDINGS (REAL-TIME EVENTS)
+            // ===================================================================
+            channel.bind('new-message', (data) => ChatUI.displayMessage(data));
+            channel.bind('message-deleted', (data) => ChatUI.removeMessage(data.messageId));
+            channel.bind('message-edited', (data) => {
+                const messageData = document.querySelector(`.message-wrapper[data-id="${data.id}"]`);
+                if(messageData){
+                    const originalUsername = messageData.querySelector('.sender-name')?.textContent || State.currentUser.email;
+                    const originalTimestamp = messageData.querySelector('.time').textContent.split('(')[0]; // get original time
+                    ChatUI.updateMessage({...data, username: originalUsername, timestamp: new Date()});
+                }
+            });
+            channel.bind('chat-cleared', () => {
+                console.log('Menerima event chat-cleared. Membersihkan UI...');
+                ChatUI.clearAllMessagesUI();
+            });
         });
     </script>
 </body>
-
 </html>
