@@ -149,13 +149,26 @@
         }
 
         #logout-btn,
+        /* TAMBAHKAN ATAU GANTI GAYA UNTUK #clear-chat-btn DENGAN INI */
+
         #clear-chat-btn {
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: var(--text-light);
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            cursor: pointer;
+            background-color: #ef4444;
+            /* Warna merah untuk aksi berbahaya */
+            border-color: transparent;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        #clear-chat-btn:hover {
+            background-color: #dc2626;
+            /* Merah lebih gelap saat disentuh */
+            transform: scale(1.05);
+        }
+
+        /* Gaya tambahan untuk status konfirmasi */
+        #clear-chat-btn.confirm-delete {
+            background-color: #b91c1c;
+            /* Merah sangat gelap untuk status 'Yakin?' */
         }
 
         .messages-container {
@@ -769,8 +782,52 @@
                 }
             });
 
+            let confirmDeleteTimeout;
+            let isConfirmingDelete = false;
             logoutBtn.addEventListener('click', () => auth.signOut());
-            clearChatBtn.addEventListener('click', async () => { /* ... */ });
+            clearChatBtn.addEventListener('click', async () => {
+                if (!isCurrentUserAdmin) return;
+
+
+                // Jika ini adalah klik kedua (konfirmasi)
+                if (isConfirmingDelete) {
+                    clearTimeout(confirmDeleteTimeout); // Hentikan timeout reset
+
+                    try {
+                        // UI state saat proses berjalan
+                        clearChatBtn.disabled = true;
+                        clearChatBtn.textContent = 'Menghapus...';
+
+                        // Memanggil fungsi backend untuk menghapus chat
+                        await fetchWithAuth(CLEAR_CHAT_URL, { method: 'POST' });
+
+                        // UI akan di-refresh oleh event Pusher, tapi kita reset tombol di sini
+                        alert('Perintah hapus semua chat telah dikirim.');
+
+                    } catch (error) {
+                        alert('Gagal menghapus chat: ' + error.message);
+                    } finally {
+                        // Kembalikan tombol ke keadaan semula setelah selesai
+                        isConfirmingDelete = false;
+                        clearChatBtn.disabled = false;
+                        clearChatBtn.textContent = 'Hapus Semua Chat';
+                        clearChatBtn.classList.remove('confirm-delete');
+                    }
+
+                } else {
+                    // Jika ini adalah klik pertama
+                    isConfirmingDelete = true;
+                    clearChatBtn.textContent = 'Yakin? Klik Lagi';
+                    clearChatBtn.classList.add('confirm-delete');
+
+                    // Atur timeout untuk mengembalikan tombol ke keadaan normal setelah 4 detik
+                    confirmDeleteTimeout = setTimeout(() => {
+                        isConfirmingDelete = false;
+                        clearChatBtn.textContent = 'Hapus Semua Chat';
+                        clearChatBtn.classList.remove('confirm-delete');
+                    }, 4000);
+                }
+            });
 
             channel.bind('new-message', displayMessage);
             channel.bind('message-deleted', data => document.querySelector(`[data-id="${data.messageId}"]`)?.remove());
