@@ -494,6 +494,13 @@
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
 
     <script>
+        if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(registration => console.log('ServiceWorker registration successful'))
+      .catch(err => console.log('ServiceWorker registration failed: ', err));
+  });
+}
         document.addEventListener('DOMContentLoaded', () => {
             const firebaseConfig = {
                 apiKey: "AIzaSyAdNwK-04FA4fxOEZQ2FDWpjzRYv4SG6zA",
