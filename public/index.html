@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat App Pro | Glassmorphism</title>
+    <title>Chat App | Glassmorphism</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -36,9 +36,10 @@
         }
         @keyframes float { 0%, 100% { transform: translateY(0) rotate(0); } 33% { transform: translateY(-20px) rotate(1deg); } 66% { transform: translateY(10px) rotate(-1deg); } }
         
-        /* === STRUKTUR RESPONSIVE & MOBILE-FIRST === */
+        /* === STRUKTUR RESPONSIVE MOBILE-FIRST (Default untuk semua layar) === */
         #auth-screen, #chat-screen {
             width: 100%;
+            height: 100%; /* Fallback */
             height: 100dvh; /* Unit modern yang mengatasi masalah keyboard HP */
             display: flex;
             align-items: center;
@@ -52,7 +53,7 @@
         }
         .chat-window {
             width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden;
-            background: var(--glass-bg); 
+            background: var(--glass-bg); /* Latar belakang kaca untuk seluruh jendela chat */
         }
 
         /* === GAYA DESKTOP (Layar > 768px) === */
@@ -90,58 +91,20 @@
         .message-bubble { max-width: 80%; padding: 0.875rem 1rem; border-radius: var(--radius); word-wrap: break-word; background: rgba(255, 255, 255, 0.9); border-bottom-left-radius: 4px; color: var(--text-primary-dark); }
         .message-wrapper.own { justify-content: flex-end; }
         .message-wrapper.own .message-bubble { background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%); border-bottom-right-radius: 4px; border-bottom-left-radius: var(--radius); }
-        .message-bubble .text { line-height: 1.5; font-size: 0.95rem; }
+        .message-bubble .text { line-height: 1.5; font-size: 0.95rem; white-space: pre-wrap; } /* Memungkinkan baris baru */
         .message-wrapper.own .message-bubble .text { color: var(--text-light); }
         .message-bubble .time { font-size: 0.75rem; color: var(--text-secondary-dark); text-align: right; display: block; opacity: 0.8; margin-top: 0.25rem; }
         .message-wrapper.own .message-bubble .time { color: rgba(255, 255, 255, 0.8); }
         .sender-name { font-size: 0.8rem; font-weight: 600; color: var(--primary-color); margin-bottom: 0.3rem; }
         .message-wrapper.own .sender-name { display: none; }
         .edited-indicator { font-size: 0.7rem; color: inherit; opacity: 0.6; margin-left: 5px; font-style: italic; }
-
-        /* === PERBAIKAN UTAMA: LAYOUT PESAN & TOMBOL AKSI === */
-        .message-wrapper {
-            display: flex;
-            align-items: flex-end; /* Menyelaraskan bubble dan tombol ke bawah */
-            gap: 8px; /* Jarak antara tombol dan bubble */
-            margin-bottom: 1rem;
-            animation: messageSlideIn 0.3s ease-out;
-        }
-        .message-wrapper.own {
-            justify-content: flex-end;
-            flex-direction: row-reverse; /* Membalik urutan: bubble dulu, baru tombol */
-        }
-        .message-actions {
-            display: flex;
-            gap: 4px; /* Jarak antar tombol edit dan hapus */
-            margin-bottom: 5px; /* Sedikit menaikkan posisi tombol */
-            opacity: 0; /* Sembunyikan secara default */
-            pointer-events: none; /* Non-aktifkan klik saat tersembunyi */
-            transition: opacity 0.2s ease-in-out;
-        }
-        .message-wrapper:hover .message-actions {
-            opacity: 1; /* Tampilkan saat hover */
-            pointer-events: auto;
-        }
-        .action-btn {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            width: 28px;
-            height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-        .action-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-        .action-btn svg {
-            width: 14px;
-            height: 14px;
-            fill: var(--text-light);
-        }
+        .message-wrapper { display: flex; align-items: flex-end; gap: 8px; margin-bottom: 1rem; animation: messageSlideIn 0.3s ease-out; }
+        .message-wrapper.own { justify-content: flex-end; flex-direction: row-reverse; }
+        .message-actions { display: flex; gap: 4px; margin-bottom: 5px; opacity: 0; pointer-events: none; transition: opacity 0.2s ease-in-out; }
+        .message-wrapper:hover .message-actions { opacity: 1; pointer-events: auto; }
+        .action-btn { background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .action-btn:hover { background: rgba(255, 255, 255, 0.3); }
+        .action-btn svg { width: 14px; height: 14px; fill: var(--text-light); }
         
         .message-input-area { padding: 1rem; background: rgba(0, 0, 0, 0.2); border-top: 1px solid var(--glass-border); backdrop-filter: blur(10px); flex-shrink: 0; }
         #message-form { display: flex; align-items: center; gap: 0.75rem; }
@@ -150,7 +113,6 @@
         #message-input:focus { outline: none; border-color: var(--primary-light); background: rgba(0, 0, 0, 0.3); }
         .send-button { width: 44px; height: 44px; background: var(--secondary-color); border: none; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         
-        /* Utility */
         .hidden { display: none !important; }
         .loading { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top-color: white; animation: spin 1s ease-in-out infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -259,26 +221,26 @@
                 messageWrapper.classList.add('message-wrapper');
                 messageWrapper.dataset.id = data.id;
 
-                const messageActions = document.createElement('div');
-                messageActions.classList.add('message-actions');
-                messageActions.innerHTML = `
-                    <button class="action-btn edit-btn" title="Edit">
-                        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"></path><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"></path></svg>
-                    </button>
-                    <button class="action-btn delete-btn" title="Hapus">
-                        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
-                    </button>`;
-                
                 const messageBubble = document.createElement('div');
                 messageBubble.classList.add('message-bubble');
-
-                messageWrapper.appendChild(messageActions);
                 messageWrapper.appendChild(messageBubble);
             }
             
-            const messageBubble = messageWrapper.querySelector('.message-bubble');
+            messageWrapper.dataset.username = data.username;
+            
             const isOwnMessage = currentUser && data.username === currentUser.email;
             messageWrapper.classList.toggle('own', isOwnMessage);
+            
+            let messageBubble = messageWrapper.querySelector('.message-bubble');
+            let messageActions = messageWrapper.querySelector('.message-actions');
+
+            if (isOwnMessage && !messageActions) {
+                 messageActions = document.createElement('div');
+                 messageActions.classList.add('message-actions');
+                 messageWrapper.insertBefore(messageActions, messageBubble);
+            } else if (!isOwnMessage && messageActions) {
+                 messageActions.remove();
+            }
 
             let senderNameHTML = '';
             if (!isOwnMessage && data.username) {
@@ -289,10 +251,20 @@
             let dateObject = data.timestamp ? (data.timestamp._seconds ? new Date(data.timestamp._seconds * 1000) : new Date(data.timestamp)) : new Date();
             const time = !isNaN(dateObject) ? dateObject.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '';
             const editedIndicator = data.isEdited ? '<span class="edited-indicator">(diubah)</span>' : '';
-            const messageText = data.newText || data.message; // Gunakan newText jika ada (untuk edit)
+            const messageText = data.newText || data.message;
             const sanitizedMessage = messageText.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
             messageBubble.innerHTML = `${senderNameHTML}<p class="text">${sanitizedMessage}</p><span class="time">${time}${editedIndicator}</span>`;
+            
+            if (isOwnMessage) {
+                 messageActions.innerHTML = `
+                    <button class="action-btn edit-btn" title="Edit">
+                        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"></path><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"></path></svg>
+                    </button>
+                    <button class="action-btn delete-btn" title="Hapus">
+                        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                    </button>`;
+            }
 
             if (isNewMessage) {
                 messagesContainer.appendChild(messageWrapper);
@@ -330,12 +302,15 @@
             }
         }
 
+        // --- Event Listeners ---
         messagesContainer.addEventListener('click', async (e) => {
-            const messageWrapper = e.target.closest('.message-wrapper');
-            if (!messageWrapper) return;
+            const actionButton = e.target.closest('.action-btn');
+            if (!actionButton) return;
+            
+            const messageWrapper = actionButton.closest('.message-wrapper');
             const messageId = messageWrapper.dataset.id;
 
-            if (e.target.closest('.delete-btn')) {
+            if (actionButton.classList.contains('delete-btn')) {
                 if (!confirm('Anda yakin ingin menghapus pesan ini?')) return;
                 try {
                     const response = await fetchWithAuth(DELETE_MESSAGE_URL, { method: 'POST', body: JSON.stringify({ messageId }) });
@@ -343,7 +318,7 @@
                 } catch (error) { console.error('Error deleting message:', error); alert(error.message); }
             }
 
-            if (e.target.closest('.edit-btn')) {
+            if (actionButton.classList.contains('edit-btn')) {
                 const textElement = messageWrapper.querySelector('.text');
                 const currentText = textElement.textContent;
                 const newText = prompt('Edit pesan Anda:', currentText);
@@ -374,7 +349,7 @@
         });
 
         channel.bind('message-edited', function(data) {
-            const el = document.querySelector(`[data-id="${data.id}"]`); // PERBAIKAN: gunakan data.id
+            const el = document.querySelector(`[data-id="${data.id}"]`);
             if(el) {
                 const textEl = el.querySelector('.text');
                 if (textEl) textEl.textContent = data.newText;
@@ -420,19 +395,27 @@
 
         logoutBtn.addEventListener('click', () => { auth.signOut(); });
 
-        auth.onAuthStateChanged(user => {
-            const authScreenEl = document.getElementById('auth-screen');
-            const chatScreenEl = document.getElementById('chat-screen');
+        auth.onAuthStateChanged(async (user) => { 
             if (user) {
                 currentUser = user;
-                authScreenEl.classList.add('hidden');
-                chatScreenEl.classList.remove('hidden');
+                authScreen.classList.add('hidden');
+                chatScreen.classList.remove('hidden');
                 userInfo.textContent = `${user.email}`;
-                fetchChatHistory();
+                
+                await fetchChatHistory();
+
+                // PERBAIKAN FINAL: Verifikasi ulang alignment setelah semua riwayat ditampilkan
+                document.querySelectorAll('.message-wrapper').forEach(wrapper => {
+                    const messageUser = wrapper.dataset.username;
+                    if(messageUser) {
+                        wrapper.classList.toggle('own', messageUser === currentUser.email);
+                    }
+                });
+
             } else {
                 currentUser = null;
-                authScreenEl.classList.remove('hidden');
-                chatScreenEl.classList.add('hidden');
+                authScreen.classList.remove('hidden');
+                chatScreen.classList.add('hidden');
             }
         });
 
@@ -455,8 +438,7 @@
                 messageInput.value = tempMessage;
             }
         });
-
-    });
-    </script>
+});
+</script>
 </body>
 </html>
