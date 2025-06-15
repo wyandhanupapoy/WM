@@ -1,25 +1,11 @@
-// Membungkus semua kode di dalam DOMContentLoaded untuk memastikan HTML sudah siap
 document.addEventListener('DOMContentLoaded', () => {
-    // =================================================================
-    // == PENGATURAN WAJIB - GANTI NILAI DI BAWAH INI ==
-    // =================================================================
 
-    // 1. Masukkan 'key' dari aplikasi Pusher Channels Anda
-    const PUSHER_KEY = '5c82ec0166360a9e296b';
-
-    // 2. Masukkan 'cluster' dari aplikasi Pusher Channels Anda
-    const PUSHER_CLUSTER = 'ap1';
-
-    // 3. Masukkan URL LENGKAP dari Netlify Function Anda
-    const NETLIFY_FUNCTION_URL = 'https://chatwm.netlify.app/.netlify/functions/send-message';
-
-    const GET_HISTORY_URL = 'https://chatwm.netlify.app/.netlify/functions/get-chat-history'; // Ganti dengan URL Netlify yang sesuai
-
-    const SEND_MESSAGE_URL = 'https://chatwm.netlify.app/.netlify/functions/send-message';
-    // =================================================================
-    // == AKHIR DARI PENGATURAN WAJIB ==
-    // =================================================================
-    // 1. Salin objek konfigurasi Firebase Anda di sini
+    // ===================================================================
+    // == PENTING: ISI KEMBALI SEMUA KONFIGURASI ANDA DI SINI ==
+    // JANGAN PERNAH SIMPAN KUNCI ASLI DI REPOSITORI PUBLIK (contoh: GitHub)
+    // Gunakan environment variables di Netlify untuk backend, 
+    // dan batasi kunci API Firebase ke domain Anda untuk frontend.
+    // ===================================================================
     const firebaseConfig = {
         apiKey: "AIzaSyAdNwK-04FA4fxOEZQ2FDWpjzRYv4SG6zA",
         authDomain: "chat-wm-database.firebaseapp.com",
@@ -30,28 +16,36 @@ document.addEventListener('DOMContentLoaded', () => {
         measurementId: "G-L4EYC054G4"
     };
 
+    const PUSHER_KEY = '5c82ec0166360a9e296b';
+    const PUSHER_CLUSTER = 'ap1';
+    const SEND_MESSAGE_URL = 'https://chatwm.netlify.app/.netlify/functions/send-message';
+    const GET_HISTORY_URL = 'https://chatwm.netlify.app/.netlify/functions/get-chat-history';
+
     // --- Inisialisasi Layanan ---
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const pusher = new Pusher(PUSHER_KEY, { cluster: PUSHER_CLUSTER });
     const channel = pusher.subscribe('chat-channel');
 
-    // --- Variabel Global & Elemen DOM ---
-    let currentUser = null;
+    // --- Elemen DOM ---
     const authScreen = document.getElementById('auth-screen');
     const chatScreen = document.getElementById('chat-screen');
     const authForm = document.getElementById('auth-form');
-    const authEmailInput = document.getElementById('auth-email');
-    const authPasswordInput = document.getElementById('auth-password');
-    const authError = document.getElementById('auth-error');
-    const authSubmitBtn = document.getElementById('auth-submit-btn');
-    const authTitle = document.getElementById('auth-title');
-    const authToggleText = document.getElementById('auth-toggle-text');
+    // ... (ambil semua elemen DOM lainnya seperti sebelumnya)
     const userInfo = document.getElementById('user-info');
     const logoutBtn = document.getElementById('logout-btn');
     const messagesContainer = document.getElementById('messages');
     const messageForm = document.getElementById('message-form');
     const messageInput = document.getElementById('message-input');
+    const authError = document.getElementById('auth-error');
+    const authSubmitBtn = document.getElementById('auth-submit-btn');
+    const authTitle = document.getElementById('auth-title');
+    const authToggleText = document.getElementById('auth-toggle-text');
+    const authEmailInput = document.getElementById('auth-email');
+    const authPasswordInput = document.getElementById('auth-password');
+
+    // --- Variabel State ---
+    let currentUser = null;
     let isLoginMode = true;
 
     // --- Fungsi-Fungsi ---
@@ -65,6 +59,12 @@ document.addEventListener('DOMContentLoaded', () => {
             messageWrapper.classList.add('own');
         }
 
+        let senderNameHTML = '';
+        if (!messageWrapper.classList.contains('own')) {
+            const sanitizedUsername = data.username.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            senderNameHTML = `<div class="sender-name">${sanitizedUsername}</div>`;
+        }
+
         let dateObject;
         if (data.timestamp && typeof data.timestamp === 'object' && data.timestamp._seconds) {
             dateObject = new Date(data.timestamp._seconds * 1000);
@@ -74,11 +74,9 @@ document.addEventListener('DOMContentLoaded', () => {
             dateObject = new Date();
         }
 
-        const time = !isNaN(dateObject) 
-            ? dateObject.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) 
-            : '';
+        const time = !isNaN(dateObject) ? dateObject.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '';
 
-        messageBubble.innerHTML = `<p class="text">${data.message}</p><span class="time">${time}</span>`;
+        messageBubble.innerHTML = `${senderNameHTML}<p class="text">${data.message}</p><span class="time">${time}</span>`;
         messageWrapper.appendChild(messageBubble);
         messagesContainer.appendChild(messageWrapper);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -106,15 +104,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Logika Otentikasi ---
     authToggleText.addEventListener('click', (e) => {
         e.preventDefault();
-        if (e.target.tagName === 'A') {
-            isLoginMode = !isLoginMode;
-            authTitle.textContent = isLoginMode ? 'Login' : 'Daftar Akun Baru';
-            authSubmitBtn.textContent = isLoginMode ? 'Login' : 'Daftar';
-            authToggleText.innerHTML = isLoginMode 
-                ? 'Belum punya akun? <a href="#">Daftar di sini</a>'
-                : 'Sudah punya akun? <a href="#">Login di sini</a>';
-            authError.textContent = '';
-        }
+        if (e.target.tagName !== 'A') return;
+        isLoginMode = !isLoginMode;
+        authTitle.textContent = isLoginMode ? 'Login' : 'Daftar Akun Baru';
+        authSubmitBtn.textContent = isLoginMode ? 'Login' : 'Daftar';
+        authToggleText.innerHTML = isLoginMode ? 'Belum punya akun? <a href="#">Daftar di sini</a>' : 'Sudah punya akun? <a href="#">Login di sini</a>';
+        authError.textContent = '';
     });
 
     authForm.addEventListener('submit', async (e) => {
@@ -122,6 +117,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const email = authEmailInput.value;
         const password = authPasswordInput.value;
         authError.textContent = '';
+        const originalText = authSubmitBtn.textContent;
+        authSubmitBtn.innerHTML = '<div class="loading"></div>';
+        authSubmitBtn.disabled = true;
+
         try {
             if (isLoginMode) {
                 await auth.signInWithEmailAndPassword(email, password);
@@ -130,24 +129,25 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             authError.textContent = error.message;
+        } finally {
+            authSubmitBtn.textContent = originalText;
+            authSubmitBtn.disabled = false;
         }
     });
 
-    logoutBtn.addEventListener('click', () => {
-        auth.signOut();
-    });
+    logoutBtn.addEventListener('click', () => { auth.signOut(); });
 
     auth.onAuthStateChanged(user => {
         if (user) {
             currentUser = user;
-            authScreen.classList.add('hidden');
-            chatScreen.classList.remove('hidden');
-            userInfo.textContent = `Login: ${user.email}`;
+            authScreen.style.display = 'none';
+            chatScreen.style.display = 'flex';
+            userInfo.textContent = `${user.email}`;
             fetchChatHistory();
         } else {
             currentUser = null;
-            authScreen.classList.remove('hidden');
-            chatScreen.classList.add('hidden');
+            authScreen.style.display = 'flex';
+            chatScreen.style.display = 'none';
         }
     });
 
@@ -157,17 +157,20 @@ document.addEventListener('DOMContentLoaded', () => {
     messageForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const message = messageInput.value.trim();
-        if (message && currentUser) {
-            try {
-                messageInput.value = ''; // Kosongkan input segera
-                await fetchWithAuth(SEND_MESSAGE_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ message: message }),
-                });
-            } catch (error) {
-                console.error('Error sending message:', error);
-                alert('Gagal mengirim pesan. Periksa konsol untuk detail.');
-            }
+        if (!message || !currentUser) return;
+
+        const tempMessage = message;
+        messageInput.value = '';
+
+        try {
+            await fetchWithAuth(SEND_MESSAGE_URL, {
+                method: 'POST',
+                body: JSON.stringify({ message: tempMessage }),
+            });
+        } catch (error) {
+            console.error('Error sending message:', error);
+            alert('Gagal mengirim pesan. Periksa konsol untuk detail.');
+            messageInput.value = tempMessage; // Kembalikan pesan jika gagal
         }
     });
 });
