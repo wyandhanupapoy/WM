@@ -1,83 +1,70 @@
 // File: netlify/functions/delete-all-messages.js
-const admin = require('firebase-admin');
-const Pusher = require('pusher');
-
-// Inisialisasi
-try {
-  if (admin.apps.length === 0) {
-    admin.initializeApp({ credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_CREDENTIALS)) });
-  }
-} catch (e) { console.error("Firebase init error", e); }
+const { initializeFirebaseAdmin, initializePusher } = require('./utils/initialize');
+const admin = initializeFirebaseAdmin();
+const pusher = initializePusher();
 const db = admin.firestore();
-const pusher = new Pusher({
-    appId: process.env.PUSHER_APP_ID,
-    key: process.env.PUSHER_KEY,
-    secret: process.env.PUSHER_SECRET,
-    cluster: process.env.PUSHER_CLUSTER,
-    useTLS: true
-});
 
 // Fungsi helper untuk menghapus koleksi secara batch
 async function deleteCollection(collectionPath, batchSize) {
     const collectionRef = db.collection(collectionPath);
-    const query = collectionRef.orderBy('__name__').limit(batchSize);
+    let query = collectionRef.orderBy('__name__').limit(batchSize);
 
-    return new Promise((resolve, reject) => {
-        deleteQueryBatch(query, resolve).catch(reject);
-    });
-}
+    while (true) {
+        const snapshot = await query.get();
+        if (snapshot.size === 0) {
+            return; // Selesai
+        }
+        
+        const batch = db.batch();
+        snapshot.docs.forEach(doc => {
+            batch.delete(doc.ref);
+        });
+        await batch.commit();
 
-async function deleteQueryBatch(query, resolve) {
-    const snapshot = await query.get();
-    if (snapshot.size === 0) {
-        return resolve();
+        // Tidak perlu process.nextTick di lingkungan serverless modern
+        // Loop akan melanjutkan setelah commit selesai
     }
-
-    const batch = db.batch();
-    snapshot.docs.forEach((doc) => {
-        batch.delete(doc.ref);
-    });
-    await batch.commit();
-
-    process.nextTick(() => {
-        deleteQueryBatch(query, resolve);
-    });
 }
 
-// Handler utama
 exports.handler = async (event) => {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS'
-  };
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 204, headers, body: '' };
-  }
+    const headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS'
+    };
+    if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers };
+    if (event.httpMethod !== 'POST') return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method Not Allowed' }) };
 
-  // Verifikasi Token dan Peran Admin
-  const authHeader = event.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) { return { statusCode: 401, headers, body: 'Unauthorized' }; }
-
-  const idToken = authHeader.split('Bearer ')[1];
-  try {
-    const decodedToken = await admin.auth().verifyIdToken(idToken);
-
-    // ✅ INI ADALAH PENGECEKAN ADMIN
-    if (decodedToken.admin !== true) {
-        return { statusCode: 403, headers, body: 'Forbidden: Admin access required.' };
+    const authHeader = event.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return { statusCode: 401, headers, body: JSON.stringify({ error: 'Unauthorized: Missing token' }) };
     }
+    const idToken = authHeader.split('Bearer ')[1];
 
-    // Jalankan penghapusan
-    await deleteCollection('messages', 100);
+    try {
+        const decodedToken = await admin.auth().verifyIdToken(idToken);
 
-    // Beri tahu semua klien untuk membersihkan layar chat mereka
-    await pusher.trigger('chat-channel', 'chat-cleared', { message: 'Chat history has been cleared by an admin.' });
+        // Pengecekan krusial: pastikan pengguna adalah admin
+        if (decodedToken.admin !== true) {
+            return { statusCode: 403, headers, body: JSON.stringify({ error: 'Forbidden: Admin access required.' }) };
+        }
 
-    return { statusCode: 200, headers, body: JSON.stringify({ status: 'success' }) };
+        console.log(`Admin '${decodedToken.email}' memulai penghapusan semua pesan...`);
+        await deleteCollection('messages', 200); // Ukuran batch bisa disesuaikan
+        console.log("Semua pesan berhasil dihapus dari Firestore.");
 
-  } catch (error) {
-    console.error("Error deleting all messages:", error);
-    return { statusCode: 500, headers, body: 'Failed to delete messages.' };
-  }
+        // Beri tahu semua klien untuk membersihkan UI mereka
+        await pusher.trigger('chat-channel', 'chat-cleared', {
+            message: 'Chat history has been cleared by an admin.'
+        });
+
+        return { statusCode: 200, headers, body: JSON.stringify({ status: 'success' }) };
+
+    } catch (error) {
+        console.error("SERVER ERROR [delete-all-messages]:", error);
+        if (error.code === 'auth/id-token-expired' || error.code === 'auth/argument-error') {
+            return { statusCode: 403, headers, body: JSON.stringify({ error: 'Forbidden: Invalid or expired token.' }) };
+        }
+        return { statusCode: 500, headers, body: JSON.stringify({ error: 'Failed to delete all messages.' }) };
+    }
 };
