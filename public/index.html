@@ -239,14 +239,15 @@
         }
 
         .message-bubble {
-            max-width: 80%;
-            padding: 0.875rem 1rem;
-            border-radius: var(--radius);
-            word-wrap: break-word;
-            background: var(--bubble-friend-bg);
-            border-bottom-left-radius: 4px;
-            color: var(--text-primary-dark);
-        }
+    max-width: 80%; 
+    padding: 0.875rem 1rem; 
+    border-radius: var(--radius); 
+    word-wrap: break-word; 
+    background: var(--bubble-friend-bg); 
+    border-bottom-left-radius: 4px; 
+    color: var(--text-primary-dark);
+    transition: all 0.2s ease; /* Smooth transition untuk perubahan warna */
+}
 
         .message-wrapper {
             display: flex !important;
@@ -290,11 +291,11 @@
         }
 
         .sender-name {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--primary-dark);
-            margin-bottom: 0.3rem;
-        }
+    font-size: 0.8rem; 
+    font-weight: 600; 
+    margin-bottom: 0.3rem;
+    opacity: 0.9;
+}
 
         .message-wrapper.own .sender-name {
             display: none;
@@ -526,49 +527,115 @@
             const messageForm = document.getElementById('message-form');
             const messageInput = document.getElementById('message-input');
 
+            // Array warna untuk bubble chat user yang berbeda
+const userColors = [
+    '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57', 
+    '#FF9FF3', '#54A0FF', '#5F27CD', '#00D2D3', '#FF9F43',
+    '#10AC84', '#EE5A24', '#0652DD', '#9C88FF', '#FFC312',
+    '#C4E538', '#12CBC4', '#FDA7DF', '#ED4C67', '#F79F1F'
+];
+
+// Fungsi untuk menampilkan indikator warna user (opsional)
+function createUserColorIndicator(username) {
+    const color = getUserColor(username);
+    return `<span style="display: inline-block; width: 12px; height: 12px; background-color: ${color}; border-radius: 50%; margin-right: 8px;"></span>`;
+}
+
+// Fungsi untuk mendapatkan warna berdasarkan username
+function getUserColor(username) {
+    if (!username) return '#E9E9EB'; // Default color
+    
+    // Hash sederhana untuk konsistensi warna per user
+    let hash = 0;
+    for (let i = 0; i < username.length; i++) {
+        hash = username.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    
+    // Ambil warna dari array berdasarkan hash
+    const colorIndex = Math.abs(hash) % userColors.length;
+    return userColors[colorIndex];
+}
+
+// Fungsi untuk menentukan warna teks yang kontras
+function getContrastTextColor(bgColor) {
+    // Konversi hex ke RGB
+    const hex = bgColor.replace('#', '');
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+    
+    // Hitung luminance
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    
+    // Return putih untuk bg gelap, hitam untuk bg terang
+    return luminance > 0.6 ? '#1f2937' : '#ffffff';
+}
+
             // --- Fungsi Utama ---
             function displayMessage(data) {
                 if (!data || (!data.message && !data.newText)) return;
 
-                let messageWrapper = document.querySelector(`[data-id="${data.id}"]`);
-                const isNewMessage = !messageWrapper;
+    let messageWrapper = document.querySelector(`[data-id="${data.id}"]`);
+    const isNewMessage = !messageWrapper;
 
-                if (isNewMessage) {
-                    messageWrapper = document.createElement('div');
-                    messageWrapper.classList.add('message-wrapper');
-                    messageWrapper.dataset.id = data.id;
+    if (isNewMessage) {
+        messageWrapper = document.createElement('div');
+        messageWrapper.classList.add('message-wrapper');
+        messageWrapper.dataset.id = data.id;
 
-                    const messageActions = document.createElement('div');
-                    messageActions.classList.add('message-actions');
+        const messageActions = document.createElement('div');
+        messageActions.classList.add('message-actions');
+        
+        const messageBubble = document.createElement('div');
+        messageBubble.classList.add('message-bubble');
 
-                    const messageBubble = document.createElement('div');
-                    messageBubble.classList.add('message-bubble');
+        messageWrapper.appendChild(messageActions);
+        messageWrapper.appendChild(messageBubble);
+    }
+    
+    messageWrapper.dataset.username = data.username;
+    
+    const isOwnMessage = currentUser && data.username === currentUser.email;
+    messageWrapper.classList.toggle('own', isOwnMessage);
+    
+    let messageBubble = messageWrapper.querySelector('.message-bubble');
+    let messageActions = messageWrapper.querySelector('.message-actions');
 
-                    messageWrapper.appendChild(messageActions);
-                    messageWrapper.appendChild(messageBubble);
-                }
+    // Tentukan warna bubble
+    let bubbleColor, textColor;
+    if (isOwnMessage) {
+        // Pesan sendiri tetap menggunakan warna cyan
+        bubbleColor = 'var(--bubble-own-bg)';
+        textColor = 'var(--text-primary-dark)';
+    } else {
+        // Pesan dari user lain menggunakan warna unik
+        bubbleColor = getUserColor(data.username);
+        textColor = getContrastTextColor(bubbleColor);
+    }
 
-                messageWrapper.dataset.username = data.username;
+    // Apply warna ke bubble
+    if (!isOwnMessage) {
+        messageBubble.style.backgroundColor = bubbleColor;
+        messageBubble.style.color = textColor;
+    } else {
+        // Reset ke default untuk pesan sendiri
+        messageBubble.style.backgroundColor = '';
+        messageBubble.style.color = '';
+    }
 
-                const isOwnMessage = currentUser && data.username === currentUser.email;
-                messageWrapper.classList.toggle('own', isOwnMessage);
+    let senderNameHTML = '';
+    if (!isOwnMessage && data.username) {
+        const sanitizedUsername = data.username.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        senderNameHTML = `<div class="sender-name" style="color: ${textColor};">${sanitizedUsername}</div>`;
+    }
 
-                let messageBubble = messageWrapper.querySelector('.message-bubble');
-                let messageActions = messageWrapper.querySelector('.message-actions');
+    let dateObject = data.timestamp ? (data.timestamp._seconds ? new Date(data.timestamp._seconds * 1000) : new Date(data.timestamp)) : new Date();
+    const time = !isNaN(dateObject) ? dateObject.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '';
+    const editedIndicator = data.isEdited ? '<span class="edited-indicator">(diubah)</span>' : '';
+    const messageText = data.newText || data.message;
+    const sanitizedMessage = messageText.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-                let senderNameHTML = '';
-                if (!isOwnMessage && data.username) {
-                    const sanitizedUsername = data.username.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                    senderNameHTML = `<div class="sender-name">${sanitizedUsername}</div>`;
-                }
-
-                let dateObject = data.timestamp ? (data.timestamp._seconds ? new Date(data.timestamp._seconds * 1000) : new Date(data.timestamp)) : new Date();
-                const time = !isNaN(dateObject) ? dateObject.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '';
-                const editedIndicator = data.isEdited ? '<span class="edited-indicator">(diubah)</span>' : '';
-                const messageText = data.newText || data.message;
-                const sanitizedMessage = messageText.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
-                messageBubble.innerHTML = `${senderNameHTML}<p class="text">${sanitizedMessage}</p><span class="time">${time}${editedIndicator}</span>`;
+    messageBubble.innerHTML = `${senderNameHTML}<p class="text">${sanitizedMessage}</p><span class="time" style="color: ${isOwnMessage ? '#0f4c54' : textColor}; opacity: 0.7;">${time}${editedIndicator}</span>`;
 
                 if (isOwnMessage) {
                     messageActions.innerHTML = `
