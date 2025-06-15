@@ -556,6 +556,50 @@
         const DELETE_MESSAGE_URL = `${BASE_URL}/delete-message`;
         const EDIT_MESSAGE_URL = `${BASE_URL}/edit-message`;
 
+        // Array warna-warni yang bagus untuk bubble chat
+            const userColors = [
+                '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57',
+                '#FF9FF3', '#54A0FF', '#5F27CD', '#00D2D3', '#FF9F43',
+                '#10AC84', '#EE5A24', '#0652DD', '#9C88FF', '#FFC312',
+                '#C4E538', '#12CBC4', '#FDA7DF', '#ED4C67', '#F79F1F'
+            ];
+
+            /**
+             * Menghasilkan warna yang konsisten berdasarkan nama pengguna.
+             * @param {string} username - Email atau nama pengguna.
+             * @returns {string} Kode warna heksadesimal.
+             */
+            function getUserColor(username) {
+                if (!username) return 'var(--bubble-friend-bg)'; // Warna default jika tidak ada username
+
+                // Hash sederhana untuk mengubah string menjadi angka
+                let hash = 0;
+                for (let i = 0; i < username.length; i++) {
+                    hash = username.charCodeAt(i) + ((hash << 5) - hash);
+                }
+
+                // Ambil warna dari palet berdasarkan hash
+                const colorIndex = Math.abs(hash) % userColors.length;
+                return userColors[colorIndex];
+            }
+
+            /**
+             * Menentukan warna teks (hitam/putih) yang paling kontras dengan warna latar.
+             * @param {string} bgColor - Kode warna heksadesimal dari latar.
+             * @returns {string} Warna '#1f2937' (gelap) atau '#ffffff' (terang).
+             */
+            function getContrastTextColor(bgColor) {
+                if (bgColor.startsWith('var(')) return 'var(--text-primary-dark)'; // Teks default untuk warna variabel CSS
+
+                const hex = bgColor.replace('#', '');
+                const r = parseInt(hex.substr(0, 2), 16);
+                const g = parseInt(hex.substr(2, 2), 16);
+                const b = parseInt(hex.substr(4, 2), 16);
+                const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+                
+                return luminance > 0.6 ? '#1f2937' : '#ffffff';
+            }
+
         // --- Inisialisasi Layanan ---
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
@@ -627,55 +671,71 @@
         }
         
         function displayMessage(data) {
-            if (!data || (!data.message && !data.imageUrl)) return;
+                // Hentikan jika tidak ada data atau konten yang bisa ditampilkan
+                if (!data || (!data.message && !data.imageUrl)) return;
 
-            const isNewMessage = !document.querySelector(`[data-id="${data.id}"]`);
-            let messageWrapper = isNewMessage ? document.createElement('div') : document.querySelector(`[data-id="${data.id}"]`);
-            
-            if (isNewMessage) {
-                messageWrapper.classList.add('message-wrapper');
-                messageWrapper.dataset.id = data.id;
-            }
+                const isNewMessage = !document.querySelector(`[data-id="${data.id}"]`);
+                let messageWrapper = isNewMessage ? document.createElement('div') : document.querySelector(`[data-id="${data.id}"]`);
+                
+                if (isNewMessage) {
+                    messageWrapper.classList.add('message-wrapper');
+                    messageWrapper.dataset.id = data.id;
+                }
 
-            const isOwnMessage = currentUser && data.username === currentUser.email;
-            messageWrapper.classList.toggle('own', isOwnMessage);
+                const isOwnMessage = currentUser && data.username === currentUser.email;
+                messageWrapper.classList.toggle('own', isOwnMessage);
 
-            // ✅ PERBAIKAN: Selalu membaca timestamp dari string ISO atau objek Date
-            const dateObject = new Date(data.timestamp);
-            const time = !isNaN(dateObject) ? dateObject.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '';
+                // --- LOGIKA PEWARNAAN DINAMIS ---
+                let bubbleColor, textColor;
+                if (isOwnMessage) {
+                    // Pesan Anda sendiri menggunakan warna default dari CSS
+                    bubbleColor = 'var(--bubble-own-bg)';
+                    textColor = 'var(--text-primary-dark)'; // Teks gelap untuk bubble cyan
+                } else {
+                    // Pesan pengguna lain mendapatkan warna unik
+                    bubbleColor = getUserColor(data.username);
+                    textColor = getContrastTextColor(bubbleColor);
+                }
+                
+                // Format data lainnya
+                const dateObject = new Date(data.timestamp);
+                const time = !isNaN(dateObject) ? dateObject.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '';
+                const editedIndicator = data.isEdited ? '<span class="edited-indicator">(diubah)</span>' : '';
+                const messageText = data.newText || data.message || '';
+                const sanitizedMessage = messageText.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-            const editedIndicator = data.isEdited ? '<span class="edited-indicator">(diubah)</span>' : '';
-            const messageText = data.newText || data.message || '';
-            const sanitizedMessage = messageText.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                // Buat konten HTML untuk bubble
+                let messageContent = '';
+                if (data.imageUrl) {
+                    messageContent += `<img src="${data.imageUrl}" alt="Foto dari ${data.username}" onclick="window.open('${data.imageUrl}', '_blank')">`;
+                }
+                if (sanitizedMessage) {
+                    messageContent += `<div class="text">${sanitizedMessage}</div>`;
+                }
 
-            let messageContent = '';
-            if (data.imageUrl) {
-                messageContent += `<img src="${data.imageUrl}" alt="Foto dari ${data.username}" onclick="window.open('${data.imageUrl}', '_blank')">`;
-            }
-            if (sanitizedMessage) {
-                messageContent += `<div class="text">${sanitizedMessage}</div>`;
-            }
-            
-            messageWrapper.innerHTML = `
-                <div class="message-actions">
-                    ${isOwnMessage ? `
-                        <button class="action-btn edit-btn" title="Edit"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"></path><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"></path></svg></button>
-                        <button class="action-btn delete-btn" title="Hapus"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg></button>
-                    ` : ''}
-                </div>
-                <div class="message-bubble">
-                    ${!isOwnMessage ? `<div class="sender-name">${data.username}</div>` : ''}
-                    ${messageContent}
-                    <span class="time">${time}${editedIndicator}</span>
-                </div>`;
-            
-            if (isNewMessage) {
-                messagesContainer.appendChild(messageWrapper);
-                if (isOwnMessage || messagesContainer.scrollHeight - messagesContainer.scrollTop < messagesContainer.clientHeight + 200) {
-                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                const senderNameHTML = !isOwnMessage ? `<div class="sender-name" style="color: ${bubbleColor};">${data.username}</div>` : '';
+
+                // Gabungkan semuanya menjadi HTML akhir untuk message wrapper
+                messageWrapper.innerHTML = `
+                    <div class="message-actions">
+                         ${isOwnMessage && !data.imageUrl ? `<button class="action-btn edit-btn" title="Edit">...</button>` : ''}
+                         ${isOwnMessage ? `<button class="action-btn delete-btn" title="Hapus">...</button>` : ''}
+                    </div>
+                    <div class="message-bubble" style="background-color: ${bubbleColor}; color: ${textColor};">
+                        ${senderNameHTML}
+                        ${messageContent}
+                        <span class="time" style="color: ${textColor}; opacity: 0.7;">${time}${editedIndicator}</span>
+                    </div>`;
+
+                // Tambahkan elemen baru ke container chat
+                if (isNewMessage) {
+                    messagesContainer.appendChild(messageWrapper);
+                    // Otomatis scroll ke bawah
+                    if (isOwnMessage || messagesContainer.scrollHeight - messagesContainer.scrollTop < messagesContainer.clientHeight + 200) {
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    }
                 }
             }
-        }
 
         async function fetchWithAuth(url, options = {}) {
             if (!currentUser) throw new Error("Pengguna belum login");
