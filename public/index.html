@@ -551,7 +551,7 @@
             const EDIT_MESSAGE_URL = 'https://chatwm.netlify.app/.netlify/functions/edit-message';
 
             // Tambahkan di bagian atas script
-            const IMGBB_API_KEY = '75d249f653daaea15ef14ec5697cac7d'; // Daftar di imgbb.com
+            const IMGBB_API_KEY = '30538c80f951e8cd64ddb41399b25ff1'; // Daftar di imgbb.com
 
             // --- Inisialisasi Layanan ---
             firebase.initializeApp(firebaseConfig);
@@ -662,7 +662,7 @@
                     const loadingEl = document.querySelector(`[data-id="${loadingMessage.id}"]`);
                     if (loadingEl) loadingEl.remove();
 
-                    // Send image message
+                    // Di bagian photo-input event listener, pastikan ini:
                     await fetchWithAuth(SEND_MESSAGE_URL, {
                         method: 'POST',
                         body: JSON.stringify({
@@ -732,6 +732,7 @@
 
             // --- Fungsi Utama ---
             function displayMessage(data) {
+                console.log('displayMessage received:', data); // DEBUG: Lihat data yang diterima
                 if (!data || (!data.message && !data.newText)) return;
 
                 let messageWrapper = document.querySelector(`[data-id="${data.id}"]`);
@@ -782,14 +783,21 @@
                     messageBubble.style.color = '';
                 }
 
-                // Di fungsi displayMessage, ganti bagian innerHTML dengan:
+                let dateObject = data.timestamp ? (data.timestamp._seconds ? new Date(data.timestamp._seconds * 1000) : new Date(data.timestamp)) : new Date();
+                const time = !isNaN(dateObject) ? dateObject.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '';
+                const editedIndicator = data.isEdited ? '<span class="edited-indicator">(diubah)</span>' : '';
+                const messageText = data.newText || data.message;
+                const sanitizedMessage = messageText.replace(/</g, "&lt;").replace(/>/g, "&gt;"); // ✅ PINDAHKAN KE SINI
+
+                // DENGAN YANG INI:
                 let messageContent = '';
                 if (data.imageUrl) {
                     messageContent = `<img src="${data.imageUrl}" alt="Foto" onclick="window.open('${data.imageUrl}', '_blank')">`;
-                    if (data.message && data.message !== '📷 Foto') {
+                    // Tampilkan teks tambahan jika ada dan bukan hanya "📷 Foto"
+                    if (data.message && data.message !== '📷 Foto' && data.message.trim() !== '') {
                         messageContent += `<p class="text">${sanitizedMessage}</p>`;
                     }
-                } else {
+                } else if (messageText && messageText.trim() !== '') {
                     messageContent = `<p class="text">${sanitizedMessage}</p>`;
                 }
 
@@ -798,12 +806,6 @@
                     const sanitizedUsername = data.username.replace(/</g, "&lt;").replace(/>/g, "&gt;");
                     senderNameHTML = `<div class="sender-name" style="color: ${textColor};">${sanitizedUsername}</div>`;
                 }
-
-                let dateObject = data.timestamp ? (data.timestamp._seconds ? new Date(data.timestamp._seconds * 1000) : new Date(data.timestamp)) : new Date();
-                const time = !isNaN(dateObject) ? dateObject.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '';
-                const editedIndicator = data.isEdited ? '<span class="edited-indicator">(diubah)</span>' : '';
-                const messageText = data.newText || data.message;
-                const sanitizedMessage = messageText.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
                 messageBubble.innerHTML = `${senderNameHTML}${messageContent}<span class="time" style="color: ${isOwnMessage ? '#0f4c54' : textColor}; opacity: 0.7;">${time}${editedIndicator}</span>`;
 
@@ -894,15 +896,29 @@
 
             async function fetchWithAuth(url, options = {}) {
                 if (!currentUser) throw new Error("User not logged in");
-                const idToken = await currentUser.getIdToken(true);
-                const headers = { ...options.headers, 'Authorization': `Bearer ${idToken}`, 'Content-Type': 'application/json' };
-                return fetch(url, { ...options, headers });
+
+                try {
+                    const idToken = await currentUser.getIdToken(true);
+                    console.log('ID Token obtained:', idToken ? 'Yes' : 'No'); // Debug log
+
+                    const headers = {
+                        ...options.headers,
+                        'Authorization': `Bearer ${idToken}`,
+                        'Content-Type': 'application/json'
+                    };
+
+                    return fetch(url, { ...options, headers });
+                } catch (error) {
+                    console.error('Error getting ID token:', error);
+                    throw new Error('Authentication failed');
+                }
             }
 
-            async function fetchChatHistory() {
+            async function fetchChatHistory(retryCount = 0) {
                 try {
                     const response = await fetchWithAuth(GET_HISTORY_URL);
                     if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
+
                     const history = await response.json();
                     messagesContainer.innerHTML = '';
                     if (Array.isArray(history)) {
@@ -913,8 +929,15 @@
                         });
                     }
                 } catch (error) {
-                    console.error('Could not fetch chat history:', error);
-                    messagesContainer.innerHTML = `<p class="error-message" style="color:white;text-align:center;">Gagal memuat riwayat chat.</p>`;
+                    console.error('Error fetching chat history:', error);
+
+                    // Jika gagal total, tampilkan pesan dan lanjutkan tanpa history
+                    if (retryCount >= 2) {
+                        messagesContainer.innerHTML = `<p style="color:#6b7280;text-align:center;padding:20px;font-style:italic;">Memulai chat baru...</p>`;
+                        return; // Lanjutkan aplikasi tanpa history
+                    }
+
+                    setTimeout(() => fetchChatHistory(retryCount + 1), 2000);
                 }
             }
 
@@ -1040,6 +1063,13 @@
                     await fetchChatHistory();
 
                     document.querySelectorAll('.message-wrapper').forEach(wrapper => {
+                        const bubble = wrapper.querySelector('.message-bubble');
+                        const img = bubble.querySelector('img');
+                        console.log(`Message ${index}:`, {
+                            hasImage: !!img,
+                            imageUrl: img ? img.src : 'No image',
+                            innerHTML: bubble.innerHTML
+                        });
                         const messageUser = wrapper.dataset.username;
                         if (messageUser) {
                             wrapper.classList.toggle('own', messageUser === currentUser.email);
