@@ -947,7 +947,7 @@
                     messagesContainer.innerHTML = '';
                     if (Array.isArray(history)) {
                         history.forEach(data => {
-                            console.log(`Processing history item ${index}:`, data); // Tambahkan ini
+                            console.log('Processing history item:', data); // Tambahkan ini
                             if (data && data.id) {
                                 displayMessage({ ...data, id: data.id });
                             }
