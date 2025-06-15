@@ -1,14 +1,54 @@
+// File: netlify/functions/edit-message.js
+
 const Pusher = require('pusher');
 const admin = require('firebase-admin');
 
-// Inisialisasi Firebase & Pusher (Salin dari fungsi Anda yang sudah ada)
-// ... (sama seperti di atas)
+// Inisialisasi Firebase & Pusher. Pastikan environment variables sudah diatur di Netlify.
+try {
+  if (admin.apps.length === 0) {
+    admin.initializeApp({
+      credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_CREDENTIALS))
+    });
+  }
+} catch (e) { console.error("Firebase init error", e); }
+
+const pusher = new Pusher({
+  appId: process.env.PUSHER_APP_ID,
+  key: process.env.PUSHER_KEY,
+  secret: process.env.PUSHER_SECRET,
+  cluster: process.env.PUSHER_CLUSTER,
+  useTLS: true
+});
+
+const db = admin.firestore();
 
 exports.handler = async (event) => {
-    // ... (CORS & Verifikasi Token - sama seperti di atas)
+    // Header untuk izin CORS, ini wajib ada di setiap fungsi
+    const headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS'
+    };
+    // Menangani preflight request dari browser
+    if (event.httpMethod === 'OPTIONS') {
+        return { statusCode: 204, headers, body: '' };
+    }
 
-    const { messageId, newText } = JSON.parse(event.body);
+    // Verifikasi Token Pengguna
+    const authHeader = event.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return { statusCode: 401, headers, body: 'Unauthorized' };
+    }
+    const idToken = authHeader.split('Bearer ')[1];
+    let decodedToken;
+    try {
+        decodedToken = await admin.auth().verifyIdToken(idToken);
+    } catch (error) {
+        return { statusCode: 403, headers, body: 'Forbidden: Invalid token' };
+    }
+    
     const userEmail = decodedToken.email;
+    const { messageId, newText } = JSON.parse(event.body);
 
     if (!messageId || !newText) {
         return { statusCode: 400, headers, body: 'Message ID and new text are required' };
@@ -30,11 +70,18 @@ exports.handler = async (event) => {
         // Update dokumen di Firestore
         await messageRef.update({
             message: newText,
-            isEdited: true
+            isEdited: true,
+            timestamp: new Date() // Perbarui juga stempel waktunya
         });
 
+        const updatedData = { 
+            id: messageId,
+            messageId: messageId,
+            newText: newText 
+        };
+        
         // Beritahu semua klien bahwa pesan telah diedit
-        await pusher.trigger('chat-channel', 'message-edited', { messageId, newText });
+        await pusher.trigger('chat-channel', 'message-edited', updatedData);
 
         return { statusCode: 200, headers, body: JSON.stringify({ status: 'success' }) };
     } catch (error) {
