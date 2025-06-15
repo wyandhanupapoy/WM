@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +8,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* === RESET & BASE STYLES === */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -17,46 +15,40 @@
         }
 
         :root {
-            --primary-color: #7c3aed;
+            --primary: #7c3aed;
             --primary-dark: #5b21b6;
             --primary-light: #a855f7;
-            --secondary-color: #10b981;
-            --background-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary: #10b981;
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             --glass-bg: rgba(255, 255, 255, 0.1);
             --glass-border: rgba(255, 255, 255, 0.2);
             --text-primary: #1f2937;
             --text-secondary: #6b7280;
             --text-light: rgba(255, 255, 255, 0.9);
-            --success-color: #10b981;
-            --error-color: #ef4444;
-            --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            --shadow-xl: 0 35px 60px -20px rgba(0, 0, 0, 0.3);
-            --border-radius: 16px;
-            --border-radius-sm: 12px;
+            --success: #10b981;
+            --error: #ef4444;
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            --radius: 16px;
+            --radius-sm: 12px;
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        html,
-        body {
+        html, body {
             height: 100%;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             overflow: hidden;
         }
 
         body {
-            background: var(--background-gradient);
+            background: var(--bg-gradient);
             position: relative;
         }
 
-        /* Animated background */
         body::before {
             content: '';
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background:
+            inset: 0;
+            background: 
                 radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
                 radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
                 radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.3) 0%, transparent 50%);
@@ -65,42 +57,17 @@
         }
 
         @keyframes float {
-
-            0%,
-            100% {
-                transform: translateY(0px) rotate(0deg);
-            }
-
-            33% {
-                transform: translateY(-20px) rotate(1deg);
-            }
-
-            66% {
-                transform: translateY(10px) rotate(-1deg);
-            }
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-20px) rotate(1deg); }
+            66% { transform: translateY(10px) rotate(-1deg); }
         }
 
         #app {
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100%;
-            padding: 20px;
-        }
-
-        .message-bubble .sender-name {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--primary-color);
-            /* Menggunakan warna tema utama */
-            margin-bottom: 0.3rem;
-            padding-bottom: 0.3rem;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        }
-
-        .message-wrapper.own .message-bubble .sender-name {
-            /* Kita tidak menampilkan nama untuk pesan sendiri, tapi ini untuk jaga-jaga */
-            display: none;
+            min-height: 100vh;
+            padding: 10px;
         }
 
         /* === AUTH SCREEN === */
@@ -117,23 +84,16 @@
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
-            border-radius: var(--border-radius);
-            padding: 2.5rem;
-            box-shadow: var(--shadow-xl);
+            border-radius: var(--radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
             transition: var(--transition);
-            animation: slideInUp 0.6s ease-out;
+            animation: slideIn 0.6s ease-out;
         }
 
-        @keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .auth-container:hover {
@@ -160,7 +120,7 @@
             padding: 1rem 1.25rem;
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: var(--border-radius-sm);
+            border-radius: var(--radius-sm);
             color: var(--text-light);
             font-size: 1rem;
             transition: var(--transition);
@@ -182,9 +142,9 @@
         .auth-submit-btn {
             width: 100%;
             padding: 1rem;
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
             border: none;
-            border-radius: var(--border-radius-sm);
+            border-radius: var(--radius-sm);
             color: white;
             font-size: 1rem;
             font-weight: 600;
@@ -206,27 +166,20 @@
             transition: left 0.5s;
         }
 
-        .auth-submit-btn:hover::before {
-            left: 100%;
-        }
-
+        .auth-submit-btn:hover::before { left: 100%; }
         .auth-submit-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(124, 58, 237, 0.4);
         }
 
-        .auth-submit-btn:active {
-            transform: translateY(0);
-        }
-
         .error-message {
-            color: var(--error-color);
+            color: var(--error);
             font-size: 0.875rem;
             text-align: center;
             margin-top: 1rem;
             padding: 0.5rem;
             background: rgba(239, 68, 68, 0.1);
-            border-radius: var(--border-radius-sm);
+            border-radius: var(--radius-sm);
             backdrop-filter: blur(10px);
             min-height: 20px;
         }
@@ -252,9 +205,9 @@
         /* === CHAT SCREEN === */
         #chat-screen {
             width: 100%;
-            max-width: 1200px;
-            height: 500px;
-            max-height: 500px;
+            max-width: min(100vw, 1200px);
+            height: 100vh;
+            max-height: 100vh;
             display: flex;
             flex-direction: column;
         }
@@ -265,17 +218,17 @@
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-xl);
+            border-radius: 0;
+            box-shadow: var(--shadow);
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            animation: slideInUp 0.6s ease-out;
+            animation: slideIn 0.6s ease-out;
         }
 
         .chat-header {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-            padding: 1.25rem 1.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 1rem 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -287,6 +240,10 @@
             color: var(--text-light);
             font-weight: 600;
             font-size: 1.1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 60%;
         }
 
         #logout-btn {
@@ -294,11 +251,12 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: var(--text-light);
             padding: 0.5rem 1rem;
-            border-radius: var(--border-radius-sm);
+            border-radius: var(--radius-sm);
             cursor: pointer;
             font-weight: 500;
             transition: var(--transition);
             backdrop-filter: blur(10px);
+            flex-shrink: 0;
         }
 
         #logout-btn:hover {
@@ -309,20 +267,14 @@
         .messages-container {
             flex: 1;
             overflow-y: auto;
-            padding: 1.5rem;
+            padding: 1rem;
             background: rgba(255, 255, 255, 0.05);
             scrollbar-width: thin;
             scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
         }
 
-        .messages-container::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .messages-container::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
+        .messages-container::-webkit-scrollbar { width: 6px; }
+        .messages-container::-webkit-scrollbar-track { background: transparent; }
         .messages-container::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.3);
             border-radius: 3px;
@@ -331,25 +283,18 @@
         .message-wrapper {
             display: flex;
             margin-bottom: 1rem;
-            animation: messageSlideIn 0.3s ease-out;
+            animation: messageSlide 0.3s ease-out;
         }
 
-        @keyframes messageSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        @keyframes messageSlide {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .message-bubble {
-            max-width: 70%;
-            padding: 1rem 1.25rem;
-            border-radius: var(--border-radius);
+            max-width: 80%;
+            padding: 0.875rem 1rem;
+            border-radius: var(--radius);
             backdrop-filter: blur(10px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             position: relative;
@@ -362,15 +307,24 @@
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
         }
 
+        .message-bubble .sender-name {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+            padding-bottom: 0.25rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
         .message-bubble .text {
             color: var(--text-primary);
             line-height: 1.5;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             margin-bottom: 0.5rem;
         }
 
         .message-bubble .time {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--text-secondary);
             text-align: right;
             display: block;
@@ -378,35 +332,25 @@
         }
 
         /* Messages from others (LEFT) */
-        .message-wrapper {
-            justify-content: flex-start;
-        }
-
+        .message-wrapper { justify-content: flex-start; }
         .message-bubble {
             background: rgba(255, 255, 255, 0.9);
             border-bottom-left-radius: 4px;
         }
 
         /* Own messages (RIGHT) */
-        .message-wrapper.own {
-            justify-content: flex-end;
-        }
-
+        .message-wrapper.own { justify-content: flex-end; }
         .message-wrapper.own .message-bubble {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
             border-bottom-right-radius: 4px;
         }
 
-        .message-wrapper.own .message-bubble .text {
-            color: var(--text-light);
-        }
-
-        .message-wrapper.own .message-bubble .time {
-            color: rgba(255, 255, 255, 0.8);
-        }
+        .message-wrapper.own .message-bubble .text { color: var(--text-light); }
+        .message-wrapper.own .message-bubble .time { color: rgba(255, 255, 255, 0.8); }
+        .message-wrapper.own .message-bubble .sender-name { display: none; }
 
         .message-input-area {
-            padding: 1.5rem;
+            padding: 1rem;
             background: rgba(255, 255, 255, 0.05);
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
@@ -416,12 +360,12 @@
         #message-form {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.75rem;
         }
 
         #message-input {
             flex: 1;
-            padding: 1rem 1.25rem;
+            padding: 0.875rem 1rem;
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 25px;
@@ -431,10 +375,7 @@
             backdrop-filter: blur(10px);
         }
 
-        #message-input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
-        }
-
+        #message-input::placeholder { color: rgba(255, 255, 255, 0.6); }
         #message-input:focus {
             outline: none;
             border-color: var(--primary-light);
@@ -443,9 +384,9 @@
         }
 
         .send-button {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, var(--secondary-color) 0%, #059669 100%);
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--secondary) 0%, #059669 100%);
             border: none;
             border-radius: 50%;
             color: white;
@@ -463,81 +404,47 @@
             box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
         }
 
-        .send-button:active {
-            transform: translateY(0) scale(1);
-        }
-
-        .hidden {
-            display: none !important;
-        }
+        .hidden { display: none !important; }
 
         /* === RESPONSIVE DESIGN === */
-        @media (max-width: 768px) {
-            #app {
-                padding: 10px;
-            }
-
+        @media (min-width: 768px) {
+            #app { padding: 20px; }
+            
             #chat-screen {
-                height: 600px;
-                max-height: none;
+                height: min(85vh, 600px);
+                max-height: min(85vh, 600px);
             }
-
-            .auth-container {
-                padding: 2rem 1.5rem;
-            }
-
-            .chat-header {
-                padding: 1rem;
-            }
-
-            #user-info {
-                font-size: 1rem;
-            }
-
-            .messages-container {
-                padding: 1rem;
-            }
-
+            
+            .chat-window { border-radius: var(--radius); }
+            
+            .auth-container { padding: 2.5rem; }
+            
+            .messages-container { padding: 1.5rem; }
+            
             .message-bubble {
-                max-width: 85%;
-                padding: 0.875rem 1rem;
+                max-width: 70%;
+                padding: 1rem 1.25rem;
             }
-
-            .message-input-area {
-                padding: 1rem;
-            }
-
-            #message-input {
-                padding: 0.875rem 1rem;
-            }
-
+            
+            .message-bubble .text { font-size: 0.95rem; }
+            
+            .message-input-area { padding: 1.5rem; }
+            
+            #message-form { gap: 1rem; }
+            
+            #message-input { padding: 1rem 1.25rem; }
+            
             .send-button {
-                width: 44px;
-                height: 44px;
+                width: 48px;
+                height: 48px;
             }
         }
 
         @media (max-width: 480px) {
-            .auth-container {
-                padding: 1.5rem;
-            }
-
-            .auth-container h2 {
-                font-size: 1.75rem;
-            }
-
-            .message-bubble {
-                max-width: 90%;
-                padding: 0.75rem;
-            }
-
-            .message-bubble .text {
-                font-size: 0.9rem;
-            }
-
-            #message-form {
-                gap: 0.75rem;
-            }
+            .auth-container { padding: 1.5rem; }
+            .auth-container h2 { font-size: 1.75rem; }
+            .message-bubble { max-width: 85%; }
+            #user-info { font-size: 1rem; }
         }
 
         /* === LOADING ANIMATION === */
@@ -551,38 +458,7 @@
             animation: spin 1s ease-in-out infinite;
         }
 
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* === ENHANCED INTERACTIONS === */
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.7);
-            }
-
-            70% {
-                box-shadow: 0 0 0 10px rgba(168, 85, 247, 0);
-            }
-
-            100% {
-                box-shadow: 0 0 0 0 rgba(168, 85, 247, 0);
-            }
-        }
-
-        /* === DARK MODE SUPPORT === */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --text-primary: #f9fafb;
-                --text-secondary: #d1d5db;
-            }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 
@@ -596,8 +472,7 @@
                         <input type="email" id="auth-email" placeholder="Email" required autocomplete="email">
                     </div>
                     <div class="input-group">
-                        <input type="password" id="auth-password" placeholder="Password" required
-                            autocomplete="current-password">
+                        <input type="password" id="auth-password" placeholder="Password" required autocomplete="current-password">
                     </div>
                     <p id="auth-error" class="error-message"></p>
                     <button type="submit" id="auth-submit-btn" class="auth-submit-btn">Login</button>
@@ -617,10 +492,8 @@
                     <form id="message-form">
                         <input type="text" id="message-input" placeholder="Ketik pesan..." autocomplete="off" required>
                         <button type="submit" class="send-button" aria-label="Kirim Pesan">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20"
-                                height="20">
-                                <path
-                                    d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                                <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
                             </svg>
                         </button>
                     </form>
@@ -633,25 +506,13 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
     <script>
-        // Membungkus semua kode di dalam DOMContentLoaded untuk memastikan HTML sudah siap
         document.addEventListener('DOMContentLoaded', () => {
-            // =================================================================
-            // == PENGATURAN WAJIB - GANTI NILAI DI BAWAH INI ==
-            // =================================================================
-
-            // 1. Masukkan 'key' dari aplikasi Pusher Channels Anda
+            // Configuration
             const PUSHER_KEY = '5c82ec0166360a9e296b';
-
-            // 2. Masukkan 'cluster' dari aplikasi Pusher Channels Anda
             const PUSHER_CLUSTER = 'ap1';
-
-            // 3. Masukkan URL LENGKAP dari Netlify Function Anda
-            const NETLIFY_FUNCTION_URL = 'https://chatwm.netlify.app/.netlify/functions/send-message';
-
             const GET_HISTORY_URL = 'https://chatwm.netlify.app/.netlify/functions/get-chat-history';
             const SEND_MESSAGE_URL = 'https://chatwm.netlify.app/.netlify/functions/send-message';
-
-            // 1. Salin objek konfigurasi Firebase Anda di sini
+            
             const firebaseConfig = {
                 apiKey: "AIzaSyAdNwK-04FA4fxOEZQ2FDWpjzRYv4SG6zA",
                 authDomain: "chat-wm-database.firebaseapp.com",
@@ -662,14 +523,16 @@
                 measurementId: "G-L4EYC054G4"
             };
 
-            // --- Inisialisasi Layanan ---
+            // Initialize services
             firebase.initializeApp(firebaseConfig);
             const auth = firebase.auth();
             const pusher = new Pusher(PUSHER_KEY, { cluster: PUSHER_CLUSTER });
             const channel = pusher.subscribe('chat-channel');
 
-            // --- Variabel Global & Elemen DOM ---
+            // DOM elements
             let currentUser = null;
+            let isLoginMode = true;
+            
             const authScreen = document.getElementById('auth-screen');
             const chatScreen = document.getElementById('chat-screen');
             const authForm = document.getElementById('auth-form');
@@ -684,9 +547,8 @@
             const messagesContainer = document.getElementById('messages');
             const messageForm = document.getElementById('message-form');
             const messageInput = document.getElementById('message-input');
-            let isLoginMode = true;
 
-            // DENGAN FUNGSI BARU YANG LEBIH LENGKAP INI:
+            // Functions
             function displayMessage(data) {
                 const messageWrapper = document.createElement('div');
                 messageWrapper.classList.add('message-wrapper');
@@ -694,22 +556,16 @@
                 const messageBubble = document.createElement('div');
                 messageBubble.classList.add('message-bubble');
 
-                // Cek jika pengirim adalah pengguna saat ini (berdasarkan email)
                 if (currentUser && data.username === currentUser.email) {
                     messageWrapper.classList.add('own');
                 }
 
-                // --- LOGIKA BARU UNTUK MENAMBAHKAN NAMA PENGIRIM ---
                 let senderNameHTML = '';
-                // Hanya tampilkan nama pengirim jika pesan tersebut BUKAN milik kita
                 if (!messageWrapper.classList.contains('own')) {
-                    // Membersihkan email untuk keamanan (mencegah injeksi HTML)
                     const sanitizedUsername = data.username.replace(/</g, "&lt;").replace(/>/g, "&gt;");
                     senderNameHTML = `<div class="sender-name">${sanitizedUsername}</div>`;
                 }
-                // --- AKHIR DARI LOGIKA BARU ---
 
-                // Logika timestamp dari sebelumnya (sudah benar)
                 let dateObject;
                 if (data.timestamp && typeof data.timestamp === 'object' && data.timestamp._seconds) {
                     dateObject = new Date(data.timestamp._seconds * 1000);
@@ -723,12 +579,11 @@
                     ? dateObject.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
                     : '';
 
-                // Gabungkan nama pengirim (jika ada), teks pesan, dan waktu
                 messageBubble.innerHTML = `
-        ${senderNameHTML}
-        <p class="text">${data.message}</p>
-        <span class="time">${time}</span>
-    `;
+                    ${senderNameHTML}
+                    <p class="text">${data.message}</p>
+                    <span class="time">${time}</span>
+                `;
 
                 messageWrapper.appendChild(messageBubble);
                 messagesContainer.appendChild(messageWrapper);
@@ -738,7 +593,11 @@
             async function fetchWithAuth(url, options = {}) {
                 if (!currentUser) throw new Error("User not logged in");
                 const idToken = await currentUser.getIdToken(true);
-                const headers = { ...options.headers, 'Authorization': `Bearer ${idToken}`, 'Content-Type': 'application/json' };
+                const headers = { 
+                    ...options.headers, 
+                    'Authorization': `Bearer ${idToken}`, 
+                    'Content-Type': 'application/json' 
+                };
                 return fetch(url, { ...options, headers });
             }
 
@@ -754,7 +613,7 @@
                 }
             }
 
-            // --- Logika Otentikasi ---
+            // Event listeners
             authToggleText.addEventListener('click', (e) => {
                 e.preventDefault();
                 if (e.target.tagName === 'A') {
@@ -774,7 +633,6 @@
                 const password = authPasswordInput.value;
                 authError.textContent = '';
 
-                // Show loading state
                 const originalText = authSubmitBtn.textContent;
                 authSubmitBtn.innerHTML = '<div class="loading"></div>';
                 authSubmitBtn.disabled = true;
@@ -802,7 +660,7 @@
                     currentUser = user;
                     authScreen.classList.add('hidden');
                     chatScreen.classList.remove('hidden');
-                    userInfo.textContent = `${user.email}`;
+                    userInfo.textContent = user.email;
                     fetchChatHistory();
                 } else {
                     currentUser = null;
@@ -811,7 +669,6 @@
                 }
             });
 
-            // --- Event Listeners Lainnya ---
             channel.bind('new-message', displayMessage);
 
             messageForm.addEventListener('submit', async (e) => {
@@ -819,7 +676,7 @@
                 const message = messageInput.value.trim();
                 if (message && currentUser) {
                     try {
-                        messageInput.value = ''; // Kosongkan input segera
+                        messageInput.value = '';
                         await fetchWithAuth(SEND_MESSAGE_URL, {
                             method: 'POST',
                             body: JSON.stringify({ message: message }),
@@ -833,5 +690,4 @@
         });
     </script>
 </body>
-
 </html>
