@@ -2,9 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ===================================================================
     // == PENTING: ISI KEMBALI SEMUA KONFIGURASI ANDA DI SINI ==
-    // JANGAN PERNAH SIMPAN KUNCI ASLI DI REPOSITORI PUBLIK (contoh: GitHub)
-    // Gunakan environment variables di Netlify untuk backend, 
-    // dan batasi kunci API Firebase ke domain Anda untuk frontend.
+    // JANGAN SIMPAN KUNCI ASLI DI REPOSITORI PUBLIK (contoh: GitHub)
     // ===================================================================
     const firebaseConfig = {
         apiKey: "AIzaSyAdNwK-04FA4fxOEZQ2FDWpjzRYv4SG6zA",
@@ -15,7 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
         appId: "1:159386402313:web:e7bba7e53123c88fad82d8",
         measurementId: "G-L4EYC054G4"
     };
-
     const PUSHER_KEY = '5c82ec0166360a9e296b';
     const PUSHER_CLUSTER = 'ap1';
     const SEND_MESSAGE_URL = 'https://chatwm.netlify.app/.netlify/functions/send-message';
@@ -31,18 +28,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const authScreen = document.getElementById('auth-screen');
     const chatScreen = document.getElementById('chat-screen');
     const authForm = document.getElementById('auth-form');
-    // ... (ambil semua elemen DOM lainnya seperti sebelumnya)
+    const authEmailInput = document.getElementById('auth-email');
+    const authPasswordInput = document.getElementById('auth-password');
+    const authError = document.getElementById('auth-error');
+    const authSubmitBtn = document.getElementById('auth-submit-btn');
+    const authTitle = document.getElementById('auth-title');
+    const authToggleText = document.getElementById('auth-toggle-text');
     const userInfo = document.getElementById('user-info');
     const logoutBtn = document.getElementById('logout-btn');
     const messagesContainer = document.getElementById('messages');
     const messageForm = document.getElementById('message-form');
     const messageInput = document.getElementById('message-input');
-    const authError = document.getElementById('auth-error');
-    const authSubmitBtn = document.getElementById('auth-submit-btn');
-    const authTitle = document.getElementById('auth-title');
-    const authToggleText = document.getElementById('auth-toggle-text');
-    const authEmailInput = document.getElementById('auth-email');
-    const authPasswordInput = document.getElementById('auth-password');
 
     // --- Variabel State ---
     let currentUser = null;
@@ -60,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         let senderNameHTML = '';
-        if (!messageWrapper.classList.contains('own')) {
+        if (!messageWrapper.classList.contains('own') && data.username) {
             const sanitizedUsername = data.username.replace(/</g, "&lt;").replace(/>/g, "&gt;");
             senderNameHTML = `<div class="sender-name">${sanitizedUsername}</div>`;
         }
@@ -71,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (data.timestamp) {
             dateObject = new Date(data.timestamp);
         } else {
-            dateObject = new Date();
+            dateObject = new Date(); // Fallback
         }
 
         const time = !isNaN(dateObject) ? dateObject.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '';
@@ -170,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Error sending message:', error);
             alert('Gagal mengirim pesan. Periksa konsol untuk detail.');
-            messageInput.value = tempMessage; // Kembalikan pesan jika gagal
+            messageInput.value = tempMessage;
         }
     });
 });

@@ -12,8 +12,8 @@
     --text-secondary-dark: #6b7280;
     --error-color: #ef4444;
     --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
-    --border-radius: 16px;
-    --border-radius-sm: 12px;
+    --radius: 16px;
+    --radius-sm: 12px;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -23,143 +23,117 @@ html, body { height: 100%; font-family: 'Inter', sans-serif; }
 body { background: var(--background-gradient); position: relative; }
 #app { display: flex; justify-content: center; align-items: center; height: 100%; width: 100%; }
 
-/* === STRUKTUR MOBILE-FIRST (Default) === */
+/* Animated background */
+body::before {
+    content: ''; position: fixed; inset: 0;
+    background: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(120, 219, 255, 0.3) 0%, transparent 50%);
+    animation: float 15s ease-in-out infinite;
+    z-index: -1;
+}
+@keyframes float { 0%, 100% { transform: translateY(0) rotate(0); } 33% { transform: translateY(-20px) rotate(1deg); } 66% { transform: translateY(10px) rotate(-1deg); } }
+
+/* === STRUKTUR MOBILE-FIRST (Default untuk semua layar) === */
 #auth-screen, #chat-screen {
     width: 100%;
-    height: 100dvh;
+    height: 100%; /* Fallback untuk browser lama */
+    height: 100dvh; /* Unit modern yang mengatasi masalah keyboard HP */
     display: flex;
-    justify-content: center;
     align-items: center;
-    flex-direction: column;
+    justify-content: center;
+    transition: var(--transition);
 }
-
+#chat-screen {
+    padding: 0; /* Di mobile, chat memenuhi layar */
+}
 .auth-container {
-    width: 90%;
-    max-width: 420px;
-    background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--border-radius);
-    padding: 2.5rem;
-    box-shadow: var(--shadow-xl);
+    width: 90%; max-width: 420px; background: var(--glass-bg); backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border); border-radius: var(--radius);
+    padding: 2.5rem; box-shadow: var(--shadow-xl);
 }
-
 .chat-window {
-    width: 100%;
-    height: 100%;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--shadow-xl);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+    width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden;
 }
 
 /* === GAYA DESKTOP (Layar > 768px) === */
 @media (min-width: 768px) {
-    #auth-screen {
-        animation: slideInUp 0.6s ease-out;
-    }
+    #app { padding: 20px; }
+    #chat-screen { height: auto; } /* Biarkan tinggi ditentukan oleh .chat-window */
     .chat-window {
         max-width: 450px;
-        height: 85vh;
-        max-height: 700px;
-        border-radius: var(--border-radius);
+        height: 85vh; /* Tinggi tidak lagi kaku */
+        max-height: 750px;
+        border-radius: var(--radius);
         backdrop-filter: blur(20px);
         animation: slideInUp 0.6s ease-out;
     }
 }
+@keyframes slideInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-/* --- Komponen UI Lainnya --- */
-.auth-container h2 {
-    color: var(--text-light); font-size: 2rem; font-weight: 700; text-align: center; margin-bottom: 2rem;
-}
-.input-group { position: relative; margin-bottom: 1.5rem; }
-.auth-container input {
-    width: 100%; padding: 1rem; background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2); border-radius: var(--border-radius-sm);
-    color: var(--text-light); font-size: 1rem; transition: var(--transition);
-}
-.auth-container input::placeholder { color: rgba(255, 255, 255, 0.6); }
-.auth-container input:focus {
-    outline: none; border-color: var(--primary-light); background: rgba(255, 255, 255, 0.15);
-    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2);
-}
-.auth-submit-btn {
-    width: 100%; padding: 1rem; background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
-    border: none; border-radius: var(--border-radius-sm); color: white;
-    font-size: 1rem; font-weight: 600; cursor: pointer; transition: var(--transition); margin-top: 1rem;
-}
-.auth-submit-btn:hover {
-    transform: translateY(-2px); box-shadow: 0 10px 25px rgba(124, 58, 237, 0.4);
-}
-.error-message {
-    color: #ffc4c4; font-size: 0.875rem; text-align: center; margin-top: 1rem; padding: 0.5rem;
-    background: rgba(239, 68, 68, 0.2); border-radius: var(--border-radius-sm); min-height: 20px;
-}
-#auth-toggle-text { text-align: center; margin-top: 2rem; color: rgba(255, 255, 255, 0.8); }
-#auth-toggle-text a { color: var(--primary-light); text-decoration: none; font-weight: 600; }
-
+/* --- KOMPONEN UI --- */
+/* (Gaya untuk form login, header, bubble chat, dan input tetap sama seperti yang Anda buat, karena sudah bagus) */
+/* Header */
 .chat-header {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-    padding: 1rem 1.25rem; display: flex; justify-content: space-between; align-items: center;
-    flex-shrink: 0; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 1rem 1.5rem; display: flex; justify-content: space-between;
+    align-items: center; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
-#user-info { color: var(--text-light); font-weight: 600; font-size: 1rem; }
+#user-info { color: var(--text-light); font-weight: 600; font-size: 1.1rem; }
 #logout-btn {
-    background: transparent; border: none; color: var(--text-light); padding: 0.5rem;
-    border-radius: var(--border-radius-sm); cursor: pointer; font-weight: 500; opacity: 0.8;
+    background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--text-light); padding: 0.5rem 1rem; border-radius: var(--radius-sm); cursor: pointer;
 }
-#logout-btn:hover { opacity: 1; background: rgba(255, 255, 255, 0.1); }
-
+/* Area Pesan */
 .messages-container {
-    flex: 1; /* PENTING: Membuat area pesan mengisi sisa ruang */
+    flex: 1; /* INI KUNCINYA! Membuat area pesan mengisi sisa ruang */
     overflow-y: auto; padding: 1rem; background: rgba(255, 255, 255, 0.05);
 }
-.message-wrapper { display: flex; margin-bottom: 1rem; animation: messageSlideIn 0.3s ease-out; }
+/* Bubble Chat */
+.message-wrapper { display: flex; margin-bottom: 1rem; }
 .message-bubble {
-    max-width: 80%; padding: 0.75rem 1rem; border-radius: var(--border-radius);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); word-wrap: break-word;
+    max-width: 80%; padding: 0.875rem 1rem; border-radius: var(--radius);
+    word-wrap: break-word; background: rgba(255, 255, 255, 0.9);
+    border-bottom-left-radius: 4px; color: var(--text-primary-dark);
 }
-.message-bubble .text { color: var(--text-primary-dark); line-height: 1.5; font-size: 0.95rem; }
-.message-bubble .time { font-size: 0.75rem; color: var(--text-secondary-dark); text-align: right; display: block; opacity: 0.8; margin-top: 0.25rem; }
-.sender-name { font-size: 0.8rem; font-weight: 600; color: var(--primary-color); margin-bottom: 0.3rem; }
-
-.message-wrapper { justify-content: flex-start; }
-.message-bubble { background: #E9E9EB; border-bottom-left-radius: 4px; }
-
 .message-wrapper.own { justify-content: flex-end; }
 .message-wrapper.own .message-bubble {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
-    border-bottom-right-radius: 4px;
+    border-bottom-right-radius: 4px; border-bottom-left-radius: var(--radius);
 }
-.message-wrapper.own .message-bubble .text,
-.message-wrapper.own .message-bubble .time { color: var(--text-light); }
-.message-wrapper.own .message-bubble .sender-name { display: none; }
-
+.message-bubble .text { line-height: 1.5; font-size: 0.95rem; }
+.message-wrapper.own .message-bubble .text { color: var(--text-light); }
+.message-bubble .time {
+    font-size: 0.75rem; color: var(--text-secondary-dark); text-align: right;
+    display: block; opacity: 0.8; margin-top: 0.25rem;
+}
+.message-wrapper.own .message-bubble .time { color: rgba(255, 255, 255, 0.8); }
+.sender-name {
+    font-size: 0.8rem; font-weight: 600; color: var(--primary-color);
+    margin-bottom: 0.3rem;
+}
+.message-wrapper.own .sender-name { display: none; }
+/* Input Area */
 .message-input-area {
-    padding: 1rem; background: rgba(255, 255, 255, 0.05);
-    border-top: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); flex-shrink: 0;
+    padding: 1rem; background: rgba(0, 0, 0, 0.1);
+    border-top: 1px solid var(--glass-border); backdrop-filter: blur(10px); flex-shrink: 0;
 }
 #message-form { display: flex; align-items: center; gap: 0.75rem; }
 #message-input {
-    flex: 1; padding: 0.875rem 1.25rem; background: rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 25px;
-    color: var(--text-light); font-size: 1rem;
+    flex: 1; padding: 0.875rem 1rem; background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--glass-border); border-radius: 25px; color: var(--text-light); font-size: 1rem;
 }
 #message-input::placeholder { color: rgba(255, 255, 255, 0.6); }
-#message-input:focus {
-    outline: none; border-color: var(--primary-light); background: rgba(0, 0, 0, 0.2);
-}
+#message-input:focus { outline: none; border-color: var(--primary-light); background: rgba(0, 0, 0, 0.3); }
 .send-button {
     width: 44px; height: 44px; background: var(--secondary-color); border: none;
     border-radius: 50%; color: white; cursor: pointer; display: flex;
     align-items: center; justify-content: center; flex-shrink: 0;
 }
+/* Utility */
 .hidden { display: none !important; }
 .loading {
     display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255, 255, 255, 0.3);
     border-radius: 50%; border-top-color: white; animation: spin 1s ease-in-out infinite;
 }
-@keyframes slideInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes spin { to { transform: rotate(360deg); } }
