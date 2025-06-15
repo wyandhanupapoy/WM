@@ -590,23 +590,31 @@
                 }
             }
 
-            auth.onAuthStateChanged(async user => {
-                if (user) {
-                    currentUser = user;
-                    const tokenResult = await user.getIdTokenResult();
-                    isCurrentUserAdmin = tokenResult.claims.admin === true;
-                    clearChatBtn.classList.toggle('hidden', !isCurrentUserAdmin);
-                    authScreen.classList.add('hidden');
-                    chatScreen.classList.remove('hidden');
-                    userInfo.textContent = user.email;
-                    await fetchChatHistory();
-                } else {
-                    currentUser = null; isCurrentUserAdmin = false;
-                    authScreen.classList.remove('hidden');
-                    chatScreen.classList.add('hidden');
-                    clearChatBtn.classList.add('hidden');
-                }
-            });
+            auth.onAuthStateChanged(async (user) => {
+    if (user) {
+        currentUser = user;
+
+        // -> Baris-baris ini adalah kuncinya <-
+        const tokenResult = await user.getIdTokenResult();
+        isCurrentUserAdmin = tokenResult.claims.admin === true;
+
+        // Menampilkan atau menyembunyikan tombol berdasarkan status admin
+        clearChatBtn.classList.toggle('hidden', !isCurrentUserAdmin);
+
+        // ... sisa kode
+        authScreen.classList.add('hidden');
+        chatScreen.classList.remove('hidden');
+        userInfo.textContent = user.email;
+        await fetchChatHistory();
+    } else {
+        currentUser = null; 
+        isCurrentUserAdmin = false;
+        authScreen.classList.remove('hidden');
+        chatScreen.classList.add('hidden');
+        // Pastikan tombol juga disembunyikan saat logout
+        clearChatBtn.classList.add('hidden');
+    }
+});
 
             // GANTI SELURUH BLOK messageForm.addEventListener DENGAN YANG INI
 

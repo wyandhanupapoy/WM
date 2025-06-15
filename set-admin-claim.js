@@ -6,10 +6,10 @@ const path = require('path');
 
 // --- KONFIGURASI ---
 // GANTI DENGAN EMAIL YANG INGIN ANDA JADIKAN ADMIN
-const ADMIN_EMAIL_TO_SET = "email-admin-anda@gmail.com"; 
+const ADMIN_EMAIL_TO_SET = "wyandhanumn@gmail.com"; 
 
 // GANTI DENGAN NAMA FILE KUNCI SERVICE ACCOUNT JSON ANDA
-const SERVICE_ACCOUNT_KEY_FILENAME = 'serviceAccountKey.json'; 
+const SERVICE_ACCOUNT_KEY_FILENAME = 'chatwm-v2-firebase-adminsdk-fbsvc-0616fbc2a9.json'; 
 
 // --- Validasi Konfigurasi Awal ---
 if (ADMIN_EMAIL_TO_SET === "email-admin-anda@gmail.com") {
