@@ -660,7 +660,16 @@
                     }
 
                     // Upload ke ImgBB
-                    const imageUrl = await uploadImageToImgBB(resizedFile);
+                    const imageUrl = data.imageUrl || data.image_url;
+
+                    console.log('Image URL check:', {
+                        imageUrl: imageUrl,
+                        dataImageUrl: data.imageUrl,
+                        dataImage_url: data.image_url,
+                        messageText: messageText
+                    });
+
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
 
                     // Kirim pesan dengan URL gambar
                     await fetchWithAuth(SEND_MESSAGE_URL, {
@@ -934,11 +943,11 @@
                     if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
 
                     const history = await response.json();
-                    console.log('Chat history received:', history); // Tambahkan ini
+                    console.log('Raw chat history:', history);
                     messagesContainer.innerHTML = '';
                     if (Array.isArray(history)) {
                         history.forEach(data => {
-                            console.log('Processing history item:', data); // Tambahkan ini
+                            console.log(`Processing history item ${index}:`, data); // Tambahkan ini
                             if (data && data.id) {
                                 displayMessage({ ...data, id: data.id });
                             }
