@@ -12,30 +12,35 @@
 
     <style>
         /* GANTI SELURUH BLOK :root LAMA ANDA DENGAN YANG INI */
-:root {
-    /* Warna Dasar */
-    --theme-dark-purple: #4C3A51;
-    --theme-warm-orange: #FF8C42;
-    --theme-vibrant-pink: #E84A5F;
-    --theme-cream: #FDF0E0;
-    --theme-beige: #FAEED1;
+        :root {
+            /* Warna Dasar */
+            --theme-dark-purple: #4C3A51;
+            --theme-warm-orange: #FF8C42;
+            --theme-vibrant-pink: #E84A5F;
+            --theme-cream: #FDF0E0;
+            --theme-beige: #FAEED1;
 
-    /* Penerapan ke elemen UI */
-    --primary-color: var(--theme-dark-purple);
-    --secondary-color: var(--theme-vibrant-pink); /* Tombol Kirim */
-    --page-bg: var(--theme-beige);                /* Latar belakang chat */
-    --app-bg: #FFFFFF;                            /* Latar belakang window utama */
-    
-    --bubble-own-bg: var(--theme-warm-orange);    /* Bubble chat Anda */
-    --bubble-friend-bg: var(--theme-cream);       /* Bubble chat teman */
+            /* Penerapan ke elemen UI */
+            --primary-color: var(--theme-dark-purple);
+            --secondary-color: var(--theme-vibrant-pink);
+            /* Tombol Kirim */
+            --page-bg: var(--theme-beige);
+            /* Latar belakang chat */
+            --app-bg: #FFFFFF;
+            /* Latar belakang window utama */
 
-    --text-light: #FFFFFF;
-    --text-primary-dark: #333333;
-    --text-secondary-dark: #6b7280;
-    
-    --radius: 18px;
-    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
+            --bubble-own-bg: var(--theme-warm-orange);
+            /* Bubble chat Anda */
+            --bubble-friend-bg: var(--theme-cream);
+            /* Bubble chat teman */
+
+            --text-light: #FFFFFF;
+            --text-primary-dark: #333333;
+            --text-secondary-dark: #6b7280;
+
+            --radius: 18px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
         * {
             box-sizing: border-box;
@@ -154,27 +159,39 @@
         }
 
         .messages-container {
-    flex: 1;
-    overflow-y: auto;
-    padding: 1rem;
-    scroll-behavior: smooth;
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            scroll-behavior: smooth;
 
-    /* -- Background Hangat Kontras -- */
-    background: linear-gradient(60deg, 
-        #ffecd2, /* Krem Pucat */
-        #fcb69f, /* Oranye Persik */
-        #ff9a9e, /* Pink Mawar */
-        #a1c4fd  /* Biru Langit Pucat */
-    );
-    background-size: 300% 300%;
-    animation: gradientAnimation 35s ease infinite;
-}
+            /* -- Background Hangat Kontras -- */
+            background: linear-gradient(60deg,
+                    #ffecd2,
+                    /* Krem Pucat */
+                    #fcb69f,
+                    /* Oranye Persik */
+                    #ff9a9e,
+                    /* Pink Mawar */
+                    #a1c4fd
+                    /* Biru Langit Pucat */
+                );
+            background-size: 300% 300%;
+            animation: gradientAnimation 35s ease infinite;
+        }
 
-@keyframes gradientAnimation {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
+        @keyframes gradientAnimation {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
 
         /* GANTI CSS LAMA ANDA DENGAN YANG INI */
 
@@ -207,19 +224,22 @@
         }
 
         /* Tambahkan text-shadow pada selector ini */
-.sender-name {
-    font-size: 0.8rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    margin-left: 10px;
-    /* Baris baru di bawah ini */
-    text-shadow: 0px 1px 3px rgba(255, 255, 255, 0.1); 
-    /* --- Mulai Perbaikan --- */
-    padding: 3px 8px;           /* Memberi ruang antara teks dan tepi kotak */
-    border-radius: 6px;         /* Membuat sudut kotak menjadi melengkung */
-    display: inline-block;      /* Memastikan padding dan bentuk kotak diterapkan dengan benar */
-    /* --- Selesai Perbaikan --- */
-}
+        .sender-name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            margin-left: 10px;
+            /* Baris baru di bawah ini */
+            text-shadow: 0px 1px 3px rgba(255, 255, 255, 0.1);
+            /* --- Mulai Perbaikan --- */
+            padding: 3px 8px;
+            /* Memberi ruang antara teks dan tepi kotak */
+            border-radius: 6px;
+            /* Membuat sudut kotak menjadi melengkung */
+            display: inline-block;
+            /* Memastikan padding dan bentuk kotak diterapkan dengan benar */
+            /* --- Selesai Perbaikan --- */
+        }
 
         .message-wrapper.own .sender-name {
             display: none;
@@ -227,47 +247,47 @@
 
         /* TAMBAHKAN BLOK CSS INI (BISA DI MANA SAJA DALAM <style>) */
 
-.loading-spinner {
-    width: 20px;
-    height: 20px;
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    border-top-color: #ffffff;
-    animation: spin 1s ease-in-out infinite;
-}
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #ffffff;
+            animation: spin 1s ease-in-out infinite;
+        }
 
-@keyframes spin {
-    to { 
-        transform: rotate(360deg); 
-    }
-}
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
 
         /* Ganti selector .message-bubble lama Anda dengan yang ini */
-.message-bubble {
-    padding: 0.875rem 1rem;
-    border-radius: 18px;
-    word-wrap: break-word;
-    line-height: 1.5;
+        .message-bubble {
+            padding: 0.875rem 1rem;
+            border-radius: 18px;
+            word-wrap: break-word;
+            line-height: 1.5;
 
-    /* -- Mulai Kode Highlight -- */
+            /* -- Mulai Kode Highlight -- */
 
-    /* 1. Tambahkan bayangan awal yang subtil */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+            /* 1. Tambahkan bayangan awal yang subtil */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
 
-    /* 2. Tambahkan transisi agar efek hover berjalan mulus */
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    
-    /* -- Selesai Kode Highlight -- */
-}
+            /* 2. Tambahkan transisi agar efek hover berjalan mulus */
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
 
-/* Tambahkan selector :hover baru ini di bawah .message-bubble */
-.message-bubble:hover {
-    /* 3. Angkat bubble sedikit ke atas saat disentuh mouse */
-    transform: translateY(-2px);
-    
-    /* 4. Buat bayangan menjadi lebih jelas */
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12);
-}
+            /* -- Selesai Kode Highlight -- */
+        }
+
+        /* Tambahkan selector :hover baru ini di bawah .message-bubble */
+        .message-bubble:hover {
+            /* 3. Angkat bubble sedikit ke atas saat disentuh mouse */
+            transform: translateY(-2px);
+
+            /* 4. Buat bayangan menjadi lebih jelas */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12);
+        }
 
         /* Bentuk "ekor" untuk bubble teman */
         .message-wrapper:not(.own) .message-bubble {
@@ -422,6 +442,9 @@
                 <div class="chat-header">
                     <div id="user-info"></div>
                     <div>
+                        <button id="debug-btn" class="hidden"
+                            style="margin-right: 10px; background-color: #5F27CD;">Debug Koleksi</button>
+
                         <button id="clear-chat-btn" class="hidden" style="margin-right: 10px;">Hapus Semua Chat</button>
                         <button id="logout-btn">Logout</button>
                     </div>
@@ -481,6 +504,9 @@
             const sendBtn = document.querySelector('#message-form .send-button');
             const sendBtnOriginalContent = sendBtn.innerHTML;
 
+            const debugBtn = document.getElementById('debug-btn'); // <-- TAMBAHKAN INI
+
+
             let currentUser = null, isCurrentUserAdmin = false, isLoginMode = true;
             const authScreen = document.getElementById('auth-screen'), chatScreen = document.getElementById('chat-screen'), authForm = document.getElementById('auth-form'), authEmailInput = document.getElementById('auth-email'), authPasswordInput = document.getElementById('auth-password'), authError = document.getElementById('auth-error'), authSubmitBtn = document.getElementById('auth-submit-btn'), authTitle = document.getElementById('auth-title'), authToggleText = document.querySelector('#auth-toggle-text a'), userInfo = document.getElementById('user-info'), logoutBtn = document.getElementById('logout-btn'), clearChatBtn = document.getElementById('clear-chat-btn'), messagesContainer = document.getElementById('messages'), messageForm = document.getElementById('message-form'), messageInput = document.getElementById('message-input'), photoBtn = document.getElementById('photo-btn'), photoInput = document.getElementById('photo-input');
 
@@ -533,10 +559,10 @@
                 let messageContent = data.imageUrl ? `<img src="${data.imageUrl}" alt="Foto dari ${data.username}" style="max-width:100%; border-radius:8px; margin-top:4px; cursor:pointer;" onclick="window.open('${data.imageUrl}', '_blank')">` : '';
                 if (sanitizedMessage) messageContent += `<div class="text">${sanitizedMessage}</div>`;
 
-                
-                const senderNameHTML = !isOwnMessage 
-    ? `<div class="sender-name" style="background-color: ${bubbleColor}; color: ${textColor};">${data.username}</div>` 
-    : '';
+
+                const senderNameHTML = !isOwnMessage
+                    ? `<div class="sender-name" style="background-color: ${bubbleColor}; color: ${textColor};">${data.username}</div>`
+                    : '';
 
                 // Ikon SVG baru untuk tombol
                 const editButtonSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="m13.83 3.41-2.24 2.24 2.83 2.83 2.24-2.24-2.83-2.83Z" /><path fill-rule="evenodd" d="M2 14.83V18h3.17l8.26-8.26-2.83-2.83L2 14.83Zm0 0L10.26 6.57l2.83 2.83L4.83 18H2v-2.83Z" clip-rule="evenodd" /></svg>`;
@@ -590,67 +616,94 @@
                 }
             }
 
+            // TAMBAHKAN BLOK EVENT LISTENER BARU INI
+
+            debugBtn.addEventListener('click', async () => {
+                if (!isCurrentUserAdmin) return;
+                alert('Mengecek koleksi di database... Lihat hasilnya di alert berikutnya.');
+
+                try {
+                    const response = await fetchWithAuth(`${BASE_URL}/list-collections`);
+                    const data = await response.json();
+
+                    if (data.collections) {
+                        if (data.collections.length > 0) {
+                            alert(`Koleksi yang ditemukan: \n\n${data.collections.join('\n')}`);
+                        } else {
+                            alert('Tidak ada koleksi yang ditemukan di root database Anda.');
+                        }
+                    } else {
+                        throw new Error(data.error || 'Respons tidak valid dari server.');
+                    }
+
+                } catch (error) {
+                    alert('Gagal melakukan debug: ' + error.message);
+                    console.error("Debug error:", error);
+                }
+            });
+
             auth.onAuthStateChanged(async (user) => {
-    if (user) {
-        currentUser = user;
+                if (user) {
+                    currentUser = user;
 
-        // -> Baris-baris ini adalah kuncinya <-
-        const tokenResult = await user.getIdTokenResult();
-        isCurrentUserAdmin = tokenResult.claims.admin === true;
+                    // -> Baris-baris ini adalah kuncinya <-
+                    const tokenResult = await user.getIdTokenResult();
+                    isCurrentUserAdmin = tokenResult.claims.admin === true;
 
-        // Menampilkan atau menyembunyikan tombol berdasarkan status admin
-        clearChatBtn.classList.toggle('hidden', !isCurrentUserAdmin);
+                    // Menampilkan atau menyembunyikan tombol berdasarkan status admin
+                    clearChatBtn.classList.toggle('hidden', !isCurrentUserAdmin);
+                    debugBtn.classList.toggle('hidden', !isCurrentUserAdmin);
 
-        // ... sisa kode
-        authScreen.classList.add('hidden');
-        chatScreen.classList.remove('hidden');
-        userInfo.textContent = user.email;
-        await fetchChatHistory();
-    } else {
-        currentUser = null; 
-        isCurrentUserAdmin = false;
-        authScreen.classList.remove('hidden');
-        chatScreen.classList.add('hidden');
-        // Pastikan tombol juga disembunyikan saat logout
-        clearChatBtn.classList.add('hidden');
-    }
-});
+                    // ... sisa kode
+                    authScreen.classList.add('hidden');
+                    chatScreen.classList.remove('hidden');
+                    userInfo.textContent = user.email;
+                    await fetchChatHistory();
+                } else {
+                    currentUser = null;
+                    isCurrentUserAdmin = false;
+                    authScreen.classList.remove('hidden');
+                    chatScreen.classList.add('hidden');
+                    // Pastikan tombol juga disembunyikan saat logout
+                    clearChatBtn.classList.add('hidden');
+                }
+            });
 
             // GANTI SELURUH BLOK messageForm.addEventListener DENGAN YANG INI
 
-messageForm.addEventListener('submit', async e => {
-    e.preventDefault();
-    const text = messageInput.value.trim();
-    if (!text) return;
+            messageForm.addEventListener('submit', async e => {
+                e.preventDefault();
+                const text = messageInput.value.trim();
+                if (!text) return;
 
-    // --- Mulai Perbaikan ---
-    // 1. Nonaktifkan input dan tombol agar tidak diklik dua kali
-    messageInput.disabled = true;
-    sendBtn.disabled = true;
-    // 2. Ganti ikon SVG dengan spinner loading
-    sendBtn.innerHTML = '<div class="loading-spinner"></div>'; 
-    // --- Selesai Perbaikan ---
+                // --- Mulai Perbaikan ---
+                // 1. Nonaktifkan input dan tombol agar tidak diklik dua kali
+                messageInput.disabled = true;
+                sendBtn.disabled = true;
+                // 2. Ganti ikon SVG dengan spinner loading
+                sendBtn.innerHTML = '<div class="loading-spinner"></div>';
+                // --- Selesai Perbaikan ---
 
-    try {
-        await fetchWithAuth(SEND_MESSAGE_URL, { 
-            method: 'POST', 
-            body: JSON.stringify({ message: text }) 
-        });
-        messageForm.reset();
-    } catch (error) {
-        alert("Gagal mengirim pesan. Silakan coba lagi.");
-        console.error("Send message error:", error);
-    } finally {
-        // --- Mulai Perbaikan ---
-        // 3. Aktifkan kembali input dan tombol
-        messageInput.disabled = false;
-        sendBtn.disabled = false;
-        // 4. Kembalikan ikon SVG asli ke dalam tombol
-        sendBtn.innerHTML = sendBtnOriginalContent; 
-        messageInput.focus();
-        // --- Selesai Perbaikan ---
-    }
-});
+                try {
+                    await fetchWithAuth(SEND_MESSAGE_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({ message: text })
+                    });
+                    messageForm.reset();
+                } catch (error) {
+                    alert("Gagal mengirim pesan. Silakan coba lagi.");
+                    console.error("Send message error:", error);
+                } finally {
+                    // --- Mulai Perbaikan ---
+                    // 3. Aktifkan kembali input dan tombol
+                    messageInput.disabled = false;
+                    sendBtn.disabled = false;
+                    // 4. Kembalikan ikon SVG asli ke dalam tombol
+                    sendBtn.innerHTML = sendBtnOriginalContent;
+                    messageInput.focus();
+                    // --- Selesai Perbaikan ---
+                }
+            });
 
             photoBtn.addEventListener('click', () => photoInput.click());
             photoInput.addEventListener('change', async e => {
