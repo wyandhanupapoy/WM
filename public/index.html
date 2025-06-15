@@ -239,15 +239,16 @@
         }
 
         .message-bubble {
-    max-width: 80%; 
-    padding: 0.875rem 1rem; 
-    border-radius: var(--radius); 
-    word-wrap: break-word; 
-    background: var(--bubble-friend-bg); 
-    border-bottom-left-radius: 4px; 
-    color: var(--text-primary-dark);
-    transition: all 0.2s ease; /* Smooth transition untuk perubahan warna */
-}
+            max-width: 80%;
+            padding: 0.875rem 1rem;
+            border-radius: var(--radius);
+            word-wrap: break-word;
+            background: var(--bubble-friend-bg);
+            border-bottom-left-radius: 4px;
+            color: var(--text-primary-dark);
+            transition: all 0.2s ease;
+            /* Smooth transition untuk perubahan warna */
+        }
 
         .message-wrapper {
             display: flex !important;
@@ -291,11 +292,11 @@
         }
 
         .sender-name {
-    font-size: 0.8rem; 
-    font-weight: 600; 
-    margin-bottom: 0.3rem;
-    opacity: 0.9;
-}
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            opacity: 0.9;
+        }
 
         .message-wrapper.own .sender-name {
             display: none;
@@ -528,123 +529,123 @@
             const messageInput = document.getElementById('message-input');
 
             // Array warna untuk bubble chat user yang berbeda
-const userColors = [
-    '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57', 
-    '#FF9FF3', '#54A0FF', '#5F27CD', '#00D2D3', '#FF9F43',
-    '#10AC84', '#EE5A24', '#0652DD', '#9C88FF', '#FFC312',
-    '#C4E538', '#12CBC4', '#FDA7DF', '#ED4C67', '#F79F1F'
-];
+            const userColors = [
+                '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57',
+                '#FF9FF3', '#54A0FF', '#5F27CD', '#00D2D3', '#FF9F43',
+                '#10AC84', '#EE5A24', '#0652DD', '#9C88FF', '#FFC312',
+                '#C4E538', '#12CBC4', '#FDA7DF', '#ED4C67', '#F79F1F'
+            ];
 
-// Fungsi untuk menampilkan indikator warna user (opsional)
-function createUserColorIndicator(username) {
-    const color = getUserColor(username);
-    return `<span style="display: inline-block; width: 12px; height: 12px; background-color: ${color}; border-radius: 50%; margin-right: 8px;"></span>`;
-}
+            // Fungsi untuk menampilkan indikator warna user (opsional)
+            function createUserColorIndicator(username) {
+                const color = getUserColor(username);
+                return `<span style="display: inline-block; width: 12px; height: 12px; background-color: ${color}; border-radius: 50%; margin-right: 8px;"></span>`;
+            }
 
-// Fungsi untuk mendapatkan warna berdasarkan username
-function getUserColor(username) {
-    if (!username) return '#E9E9EB'; // Default color
-    
-    // Hash sederhana untuk konsistensi warna per user
-    let hash = 0;
-    for (let i = 0; i < username.length; i++) {
-        hash = username.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    
-    // Ambil warna dari array berdasarkan hash
-    const colorIndex = Math.abs(hash) % userColors.length;
-    return userColors[colorIndex];
-}
+            // Fungsi untuk mendapatkan warna berdasarkan username
+            function getUserColor(username) {
+                if (!username) return '#E9E9EB'; // Default color
 
-// Fungsi untuk menentukan warna teks yang kontras
-function getContrastTextColor(bgColor) {
-    // Konversi hex ke RGB
-    const hex = bgColor.replace('#', '');
-    const r = parseInt(hex.substr(0, 2), 16);
-    const g = parseInt(hex.substr(2, 2), 16);
-    const b = parseInt(hex.substr(4, 2), 16);
-    
-    // Hitung luminance
-    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-    
-    // Return putih untuk bg gelap, hitam untuk bg terang
-    return luminance > 0.6 ? '#1f2937' : '#ffffff';
-}
+                // Hash sederhana untuk konsistensi warna per user
+                let hash = 0;
+                for (let i = 0; i < username.length; i++) {
+                    hash = username.charCodeAt(i) + ((hash << 5) - hash);
+                }
+
+                // Ambil warna dari array berdasarkan hash
+                const colorIndex = Math.abs(hash) % userColors.length;
+                return userColors[colorIndex];
+            }
+
+            // Fungsi untuk menentukan warna teks yang kontras
+            function getContrastTextColor(bgColor) {
+                // Konversi hex ke RGB
+                const hex = bgColor.replace('#', '');
+                const r = parseInt(hex.substr(0, 2), 16);
+                const g = parseInt(hex.substr(2, 2), 16);
+                const b = parseInt(hex.substr(4, 2), 16);
+
+                // Hitung luminance
+                const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+                // Return putih untuk bg gelap, hitam untuk bg terang
+                return luminance > 0.6 ? '#1f2937' : '#ffffff';
+            }
 
             // --- Fungsi Utama ---
             function displayMessage(data) {
                 if (!data || (!data.message && !data.newText)) return;
 
-    let messageWrapper = document.querySelector(`[data-id="${data.id}"]`);
-    const isNewMessage = !messageWrapper;
+                let messageWrapper = document.querySelector(`[data-id="${data.id}"]`);
+                const isNewMessage = !messageWrapper;
 
-    if (isNewMessage) {
-        messageWrapper = document.createElement('div');
-        messageWrapper.classList.add('message-wrapper');
-        messageWrapper.dataset.id = data.id;
+                if (isNewMessage) {
+                    messageWrapper = document.createElement('div');
+                    messageWrapper.classList.add('message-wrapper');
+                    messageWrapper.dataset.id = data.id;
 
-        const messageActions = document.createElement('div');
-        messageActions.classList.add('message-actions');
-        
-        const messageBubble = document.createElement('div');
-        messageBubble.classList.add('message-bubble');
+                    const messageActions = document.createElement('div');
+                    messageActions.classList.add('message-actions');
 
-        messageWrapper.appendChild(messageActions);
-        messageWrapper.appendChild(messageBubble);
-    }
-    
-    messageWrapper.dataset.username = data.username;
-    
-    const isOwnMessage = currentUser && data.username === currentUser.email;
-    messageWrapper.classList.toggle('own', isOwnMessage);
-    
-    let messageBubble = messageWrapper.querySelector('.message-bubble');
-    let messageActions = messageWrapper.querySelector('.message-actions');
+                    const messageBubble = document.createElement('div');
+                    messageBubble.classList.add('message-bubble');
 
-    // Tentukan warna bubble
-    let bubbleColor, textColor;
-    if (isOwnMessage) {
-        // Pesan sendiri tetap menggunakan warna cyan
-        bubbleColor = 'var(--bubble-own-bg)';
-        textColor = 'var(--text-primary-dark)';
-    } else {
-        // Pesan dari user lain menggunakan warna unik
-        bubbleColor = getUserColor(data.username);
-        textColor = getContrastTextColor(bubbleColor);
-    }
+                    messageWrapper.appendChild(messageActions);
+                    messageWrapper.appendChild(messageBubble);
+                }
 
-    // Apply warna ke bubble
-    if (!isOwnMessage) {
-        messageBubble.style.backgroundColor = bubbleColor;
-        messageBubble.style.color = textColor;
-    } else {
-        // Reset ke default untuk pesan sendiri
-        messageBubble.style.backgroundColor = '';
-        messageBubble.style.color = '';
-    }
+                messageWrapper.dataset.username = data.username;
 
-    let senderNameHTML = '';
-    if (!isOwnMessage && data.username) {
-        const sanitizedUsername = data.username.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        senderNameHTML = `<div class="sender-name" style="color: ${textColor};">${sanitizedUsername}</div>`;
-    }
+                const isOwnMessage = currentUser && data.username === currentUser.email;
+                messageWrapper.classList.toggle('own', isOwnMessage);
 
-    let dateObject = data.timestamp ? (data.timestamp._seconds ? new Date(data.timestamp._seconds * 1000) : new Date(data.timestamp)) : new Date();
-    const time = !isNaN(dateObject) ? dateObject.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '';
-    const editedIndicator = data.isEdited ? '<span class="edited-indicator">(diubah)</span>' : '';
-    const messageText = data.newText || data.message;
-    const sanitizedMessage = messageText.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                let messageBubble = messageWrapper.querySelector('.message-bubble');
+                let messageActions = messageWrapper.querySelector('.message-actions');
 
-    messageBubble.innerHTML = `${senderNameHTML}<p class="text">${sanitizedMessage}</p><span class="time" style="color: ${isOwnMessage ? '#0f4c54' : textColor}; opacity: 0.7;">${time}${editedIndicator}</span>`;
+                // Tentukan warna bubble
+                let bubbleColor, textColor;
+                if (isOwnMessage) {
+                    // Pesan sendiri tetap menggunakan warna cyan
+                    bubbleColor = 'var(--bubble-own-bg)';
+                    textColor = 'var(--text-primary-dark)';
+                } else {
+                    // Pesan dari user lain menggunakan warna unik
+                    bubbleColor = getUserColor(data.username);
+                    textColor = getContrastTextColor(bubbleColor);
+                }
+
+                // Apply warna ke bubble
+                if (!isOwnMessage) {
+                    messageBubble.style.backgroundColor = bubbleColor;
+                    messageBubble.style.color = textColor;
+                } else {
+                    // Reset ke default untuk pesan sendiri
+                    messageBubble.style.backgroundColor = '';
+                    messageBubble.style.color = '';
+                }
+
+                let senderNameHTML = '';
+                if (!isOwnMessage && data.username) {
+                    const sanitizedUsername = data.username.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    senderNameHTML = `<div class="sender-name" style="color: ${textColor};">${sanitizedUsername}</div>`;
+                }
+
+                let dateObject = data.timestamp ? (data.timestamp._seconds ? new Date(data.timestamp._seconds * 1000) : new Date(data.timestamp)) : new Date();
+                const time = !isNaN(dateObject) ? dateObject.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '';
+                const editedIndicator = data.isEdited ? '<span class="edited-indicator">(diubah)</span>' : '';
+                const messageText = data.newText || data.message;
+                const sanitizedMessage = messageText.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+                messageBubble.innerHTML = `${senderNameHTML}<p class="text">${sanitizedMessage}</p><span class="time" style="color: ${isOwnMessage ? '#0f4c54' : textColor}; opacity: 0.7;">${time}${editedIndicator}</span>`;
 
                 if (isOwnMessage) {
                     messageActions.innerHTML = `
                     <button class="action-btn edit-btn" title="Edit">
-                        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"></path><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"></path></svg>
-                    </button>
-                    <button class="action-btn delete-btn" title="Hapus">
-                        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
-                    </button>`;
+            <svg viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"></path><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"></path></svg>
+        </button>
+        <button class="action-btn delete-btn" title="Hapus">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+        </button>`;
                 } else {
                     messageActions.innerHTML = '';
                 }
@@ -658,6 +659,69 @@ function getContrastTextColor(bgColor) {
                     messagesContainer.scrollTop = messagesContainer.scrollHeight;
                 }
             }
+
+            // Pastikan ini ada SETELAH fungsi displayMessage
+            document.addEventListener('click', async (e) => {
+                // Cek apakah yang diklik adalah tombol aksi dalam message
+                const actionButton = e.target.closest('.action-btn');
+                if (!actionButton) return;
+
+                const messageWrapper = actionButton.closest('.message-wrapper');
+                if (!messageWrapper) return;
+
+                const messageId = messageWrapper.dataset.id;
+                console.log('Action button clicked:', actionButton.className, 'Message ID:', messageId); // Debug log
+
+                if (actionButton.classList.contains('delete-btn')) {
+                    if (!confirm('Anda yakin ingin menghapus pesan ini?')) return;
+
+                    try {
+                        console.log('Attempting to delete message:', messageId); // Debug log
+                        const response = await fetchWithAuth(DELETE_MESSAGE_URL, {
+                            method: 'POST',
+                            body: JSON.stringify({ messageId })
+                        });
+
+                        if (!response.ok) {
+                            const errorText = await response.text();
+                            console.error('Delete response error:', errorText);
+                            throw new Error('Gagal menghapus pesan di server.');
+                        }
+                        console.log('Message deleted successfully'); // Debug log
+                    } catch (error) {
+                        console.error('Error deleting message:', error);
+                        alert(error.message);
+                    }
+                }
+
+                if (actionButton.classList.contains('edit-btn')) {
+                    const textElement = messageWrapper.querySelector('.text');
+                    if (!textElement) return;
+
+                    const currentText = textElement.textContent;
+                    const newText = prompt('Edit pesan Anda:', currentText);
+
+                    if (newText && newText.trim() !== currentText) {
+                        try {
+                            console.log('Attempting to edit message:', messageId, 'New text:', newText.trim()); // Debug log
+                            const response = await fetchWithAuth(EDIT_MESSAGE_URL, {
+                                method: 'POST',
+                                body: JSON.stringify({ messageId, newText: newText.trim() })
+                            });
+
+                            if (!response.ok) {
+                                const errorData = await response.json().catch(() => ({ error: 'Unknown server error' }));
+                                console.error('Edit response error:', errorData);
+                                throw new Error(`Server error: ${errorData.error || response.statusText}`);
+                            }
+                            console.log('Message edited successfully'); // Debug log
+                        } catch (error) {
+                            console.error('Detailed error editing message:', error);
+                            alert(`Gagal mengedit pesan: ${error.message}`);
+                        }
+                    }
+                }
+            });
 
             async function fetchWithAuth(url, options = {}) {
                 if (!currentUser) throw new Error("User not logged in");
@@ -685,44 +749,12 @@ function getContrastTextColor(bgColor) {
                 }
             }
 
-            messagesContainer.addEventListener('click', async (e) => {
-                const actionButton = e.target.closest('.action-btn');
-                if (!actionButton) return;
-
-                const messageWrapper = actionButton.closest('.message-wrapper');
-                const messageId = messageWrapper.dataset.id;
-
-                if (actionButton.classList.contains('delete-btn')) {
-                    if (!confirm('Anda yakin ingin menghapus pesan ini?')) return;
-                    try {
-                        const response = await fetchWithAuth(DELETE_MESSAGE_URL, { method: 'POST', body: JSON.stringify({ messageId }) });
-                        if (!response.ok) throw new Error('Gagal menghapus pesan di server.');
-                    } catch (error) { console.error('Error deleting message:', error); alert(error.message); }
-                }
-
-                if (actionButton.classList.contains('edit-btn')) {
-                    const textElement = messageWrapper.querySelector('.text');
-                    const currentText = textElement.textContent;
-                    const newText = prompt('Edit pesan Anda:', currentText);
-                    if (newText && newText.trim() !== currentText) {
-                        try {
-                            const response = await fetchWithAuth(EDIT_MESSAGE_URL, { method: 'POST', body: JSON.stringify({ messageId, newText: newText.trim() }) });
-                            if (!response.ok) {
-                                const errorData = await response.json().catch(() => ({ error: 'Unknown server error' }));
-                                throw new Error(`Server error: ${errorData.error || response.statusText}`);
-                            }
-                        } catch (error) {
-                            console.error('Detailed error editing message:', error);
-                            alert(`Gagal mengedit pesan: ${error.message}`);
-                        }
-                    }
-                }
-            });
+            //
 
             channel.bind('new-message', data => {
                 if (data && (data.message || data.newText)) {
                     displayMessage({ ...data, id: data.id || `rt_${Math.random()}` });
-                    
+
 
                     // Tampilkan notifikasi jika pesan bukan dari user sendiri
                     if (currentUser && data.username !== currentUser.email) {
@@ -731,7 +763,7 @@ function getContrastTextColor(bgColor) {
                         showNotification(`Pesan baru dari ${senderName}`, messageText, senderName);
                     }
                 }
-                });
+            });
 
             channel.bind('message-deleted', function (data) {
                 const el = document.querySelector(`[data-id="${data.messageId}"]`);
@@ -748,9 +780,9 @@ function getContrastTextColor(bgColor) {
                         timeEl.innerHTML += ' <span class="edited-indicator">(diubah)</span>';
                     }
                     // Notifikasi untuk pesan yang diedit (jika bukan dari user sendiri)
-        if (currentUser && data.username !== currentUser.email) {
-            showNotification(`${data.username} mengedit pesan`, data.newText, data.username);
-        }
+                    if (currentUser && data.username !== currentUser.email) {
+                        showNotification(`${data.username} mengedit pesan`, data.newText, data.username);
+                    }
                 }
             });
 
@@ -799,7 +831,7 @@ function getContrastTextColor(bgColor) {
             }
 
             // Tambahkan variabel untuk kontrol notifikasi
-let notificationsEnabled = true;
+            let notificationsEnabled = true;
 
             // Fungsi untuk menampilkan notifikasi
             function showNotification(title, message, sender) {
