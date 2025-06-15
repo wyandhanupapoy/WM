@@ -1,37 +1,50 @@
 // File: netlify/functions/delete-all-messages.js
+// ALGORITMA YANG TELAH DIPERBAIKI DAN LEBIH ROBUST
+
 const { initializeFirebaseAdmin, initializePusher } = require('./utils/initialize');
+
 const admin = initializeFirebaseAdmin();
 const pusher = initializePusher();
 const db = admin.firestore();
 
-// Fungsi helper untuk menghapus koleksi secara batch
-async function deleteCollection(collectionPath, batchSize) {
-    const collectionRef = db.collection(collectionPath);
-    let query = collectionRef.orderBy('__name__').limit(batchSize);
-
-    while (true) {
+/**
+ * Fungsi rekursif yang lebih andal untuk menghapus dokumen dalam batch.
+ * @param {FirebaseFirestore.Query} query - Query Firestore untuk dokumen yang akan dihapus.
+ * @param {Function} resolve - Fungsi resolve dari Promise.
+ * @param {Function} reject - Fungsi reject dari Promise.
+ * @param {number} totalDeleted - Akumulator untuk jumlah dokumen yang dihapus.
+ */
+async function deleteQueryBatch(query, resolve, reject, totalDeleted = 0) {
+    try {
         const snapshot = await query.get();
 
-        // --- TAMBAHKAN BARIS DEBUG INI ---
-        console.log(`Snapshot ditemukan dengan ukuran: ${snapshot.size}`);
-        // ------------------------------------
-
-        
+        // Kondisi berhenti (base case): tidak ada lagi dokumen yang ditemukan.
         if (snapshot.size === 0) {
-            return; // Selesai
+            console.log(`Proses selesai. Total dokumen yang dihapus: ${totalDeleted}`);
+            return resolve();
         }
-        
+
+        // Buat batch untuk menghapus dokumen yang ditemukan.
         const batch = db.batch();
         snapshot.docs.forEach(doc => {
             batch.delete(doc.ref);
         });
+        const numDeleted = snapshot.size;
         await batch.commit();
 
-        // Tidak perlu process.nextTick di lingkungan serverless modern
-        // Loop akan melanjutkan setelah commit selesai
+        // Lanjutkan ke batch berikutnya secara rekursif.
+        // Ini lebih aman daripada loop `while(true)` di beberapa lingkungan.
+        process.nextTick(() => {
+            deleteQueryBatch(query, resolve, reject, totalDeleted + numDeleted);
+        });
+
+    } catch (error) {
+        console.error("Error selama proses penghapusan batch:", error);
+        reject(error);
     }
 }
 
+// Handler utama
 exports.handler = async (event) => {
     const headers = {
         'Access-Control-Allow-Origin': '*',
@@ -50,16 +63,22 @@ exports.handler = async (event) => {
     try {
         const decodedToken = await admin.auth().verifyIdToken(idToken);
 
-        // Pengecekan krusial: pastikan pengguna adalah admin
         if (decodedToken.admin !== true) {
             return { statusCode: 403, headers, body: JSON.stringify({ error: 'Forbidden: Admin access required.' }) };
         }
 
         console.log(`Admin '${decodedToken.email}' memulai penghapusan semua pesan...`);
-        await deleteCollection('messages', 200); // Ukuran batch bisa disesuaikan
+        
+        const collectionRef = db.collection('messages');
+        const query = collectionRef.orderBy('__name__').limit(200); // Ukuran batch
+
+        // Membungkus proses rekursif dalam Promise
+        await new Promise((resolve, reject) => {
+            deleteQueryBatch(query, resolve, reject).catch(reject);
+        });
+
         console.log("Semua pesan berhasil dihapus dari Firestore.");
 
-        // Beri tahu semua klien untuk membersihkan UI mereka
         await pusher.trigger('chat-channel', 'chat-cleared', {
             message: 'Chat history has been cleared by an admin.'
         });
@@ -68,9 +87,6 @@ exports.handler = async (event) => {
 
     } catch (error) {
         console.error("SERVER ERROR [delete-all-messages]:", error);
-        if (error.code === 'auth/id-token-expired' || error.code === 'auth/argument-error') {
-            return { statusCode: 403, headers, body: JSON.stringify({ error: 'Forbidden: Invalid or expired token.' }) };
-        }
         return { statusCode: 500, headers, body: JSON.stringify({ error: 'Failed to delete all messages.' }) };
     }
 };
