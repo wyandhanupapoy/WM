@@ -653,33 +653,24 @@
                 photoBtn.innerHTML = '<div class="loading"></div>';
 
                 try {
-                    // Resize image jika terlalu besar
+                    // 1. Resize gambar jika perlu (sudah benar)
                     const resizedFile = file.size > 1024 * 1024 ? await resizeImage(file) : file;
                     if (resizedFile !== file && !resizedFile.name) {
                         resizedFile.name = file.name || 'resized_image.jpg';
                     }
 
-                    // Upload ke ImgBB
-                    const imageUrl = data.imageUrl || data.image_url;
+                    // 2. Upload gambar ke ImgBB dan TUNGGU hasilnya
+                    const imageUrl = await uploadImageToImgBB(resizedFile);
 
-                    console.log('Image URL check:', {
-                        imageUrl: imageUrl,
-                        dataImageUrl: data.imageUrl,
-                        dataImage_url: data.image_url,
-                        messageText: messageText
-                    });
-
-                    onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
-
-                    // Kirim pesan dengan URL gambar
+                    // 3. Kirim pesan ke server dengan URL yang didapat dari langkah 2
                     await fetchWithAuth(SEND_MESSAGE_URL, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
-                            message: '',  // Kosongkan message untuk foto
-                            imageUrl: imageUrl,
+                            message: '',  // Pesan teks dikosongkan untuk gambar
+                            imageUrl: imageUrl, // Gunakan variabel imageUrl dari hasil upload
                             messageType: 'image'
                         }),
                     });
@@ -966,28 +957,26 @@
                 }
             }
 
-            //
-
-            channel.bind('new-message', data => {
-                if (data && (data.message || data.newText)) {
+            channel.bind('new-message', data => { // <-- PERBAIKAN
+                // Tambahkan pengecekan untuk imageUrl agar pesan gambar juga tampil
+                if (data && (data.message || data.newText || data.imageUrl)) {
                     displayMessage({ ...data, id: data.id || `rt_${Math.random()}` });
-
 
                     // Tampilkan notifikasi jika pesan bukan dari user sendiri
                     if (currentUser && data.username !== currentUser.email) {
                         const senderName = data.username || 'Seseorang';
-                        const messageText = data.message || data.newText;
+                        const messageText = data.message || (data.imageUrl ? '[Gambar]' : data.newText);
                         showNotification(`Pesan baru dari ${senderName}`, messageText, senderName);
                     }
                 }
             });
 
-            channel.bind('message-deleted', function (data) {
+            channel.bind('message-deleted', function (data) { // <-- PERBAIKAN
                 const el = document.querySelector(`[data-id="${data.messageId}"]`);
                 if (el) { el.style.transition = 'opacity 0.3s ease'; el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }
             });
 
-            channel.bind('message-edited', function (data) {
+            channel.bind('message-edited', function (data) { // <-- PERBAIKAN
                 const el = document.querySelector(`[data-id="${data.id}"]`);
                 if (el) {
                     const textEl = el.querySelector('.text');
