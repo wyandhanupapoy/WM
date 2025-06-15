@@ -11,6 +11,12 @@ async function deleteCollection(collectionPath, batchSize) {
 
     while (true) {
         const snapshot = await query.get();
+
+        // --- TAMBAHKAN BARIS DEBUG INI ---
+        console.log(`Snapshot ditemukan dengan ukuran: ${snapshot.size}`);
+        // ------------------------------------
+
+        
         if (snapshot.size === 0) {
             return; // Selesai
         }
