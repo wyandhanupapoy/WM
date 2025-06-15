@@ -22,6 +22,7 @@
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html, body { height: 100%; font-family: 'Inter', sans-serif; }
+
         body { background: var(--background-gradient); position: relative; }
         #app { display: flex; justify-content: center; align-items: center; height: 100%; width: 100%; }
 
@@ -35,14 +36,15 @@
         }
         @keyframes float { 0%, 100% { transform: translateY(0) rotate(0); } 33% { transform: translateY(-20px) rotate(1deg); } 66% { transform: translateY(10px) rotate(-1deg); } }
         
-        /* === STRUKTUR MOBILE-FIRST (Default untuk semua layar) === */
+        /* === STRUKTUR RESPONSIVE & MOBILE-FIRST === */
         #auth-screen, #chat-screen {
             width: 100%;
-            height: 100dvh; /* Unit modern yang mengatasi masalah keyboard HP */
+            height: 100%; /* Fallback */
+            height: 100dvh; /* PERBAIKAN UTAMA: Menggunakan Dynamic Viewport Height untuk mengatasi masalah keyboard */
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.3s ease-in-out;
         }
         .auth-container {
             width: 90%; max-width: 420px; background: var(--glass-bg); backdrop-filter: blur(20px);
@@ -51,12 +53,13 @@
         }
         .chat-window {
             width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden;
+            background: var(--glass-bg); /* Latar belakang kaca untuk seluruh jendela chat */
         }
 
         /* === GAYA DESKTOP (Layar > 768px) === */
         @media (min-width: 768px) {
             #app { padding: 20px; }
-            #auth-screen, #chat-screen { height: auto; }
+            #auth-screen, #chat-screen { height: auto; } /* Tinggi di desktop diatur oleh .chat-window */
             .chat-window {
                 max-width: 450px;
                 height: 85vh;
@@ -84,7 +87,7 @@
         #logout-btn { background: transparent; border: none; color: var(--text-light); padding: 0.5rem; border-radius: var(--radius-sm); cursor: pointer; font-weight: 500; opacity: 0.8; }
         #logout-btn:hover { opacity: 1; background: rgba(255, 255, 255, 0.1); }
         
-        .messages-container { flex: 1; overflow-y: auto; padding: 1rem; background: rgba(0, 0, 0, 0.1); }
+        .messages-container { flex: 1; overflow-y: auto; padding: 1rem; background: rgba(0, 0, 0, 0.1); scroll-behavior: smooth;}
         .message-wrapper { display: flex; margin-bottom: 1rem; position: relative; animation: messageSlideIn 0.3s ease-out; }
         .message-wrapper:hover .message-actions { opacity: 1; transform: translateY(0); pointer-events: auto; }
         .message-bubble { max-width: 80%; padding: 0.875rem 1rem; border-radius: var(--radius); word-wrap: break-word; background: rgba(255, 255, 255, 0.9); border-bottom-left-radius: 4px; color: var(--text-primary-dark); }
@@ -98,7 +101,7 @@
         .message-wrapper.own .sender-name { display: none; }
         .edited-indicator { font-size: 0.7rem; color: inherit; opacity: 0.6; margin-left: 5px; font-style: italic; }
         
-        .message-actions { position: absolute; top: -16px; background: #fff; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); padding: 2px; border: 1px solid #eee; display: flex; opacity: 0; transition: var(--transition); transform: translateY(5px); pointer-events: none; }
+        .message-actions { position: absolute; top: -16px; background: #fff; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); padding: 2px; border: 1px solid #eee; display: flex; opacity: 0; transition: var(--transition); transform: translateY(5px); pointer-events: none; z-index: 10; }
         .message-wrapper.own .message-actions { right: 0; }
         .action-btn { background: none; border: none; cursor: pointer; padding: 6px; }
         .action-btn:hover svg { transform: scale(1.15); }
@@ -209,8 +212,12 @@
         
         // --- Fungsi Utama ---
         function displayMessage(data) {
+            if (!data || !data.message) return; // Guard clause to prevent rendering empty messages
+
             let messageWrapper = document.querySelector(`[data-id="${data.id}"]`);
-            if (!messageWrapper) {
+            const isNewMessage = !messageWrapper;
+
+            if (isNewMessage) {
                 messageWrapper = document.createElement('div');
                 messageWrapper.classList.add('message-wrapper');
                 messageWrapper.dataset.id = data.id;
@@ -218,7 +225,6 @@
                 const messageBubble = document.createElement('div');
                 messageBubble.classList.add('message-bubble');
                 messageWrapper.appendChild(messageBubble);
-                messagesContainer.appendChild(messageWrapper);
             }
             
             const messageBubble = messageWrapper.querySelector('.message-bubble');
@@ -233,8 +239,9 @@
             let dateObject = data.timestamp ? (data.timestamp._seconds ? new Date(data.timestamp._seconds * 1000) : new Date(data.timestamp)) : new Date();
             const time = !isNaN(dateObject) ? dateObject.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '';
             const editedIndicator = data.isEdited ? '<span class="edited-indicator">(diubah)</span>' : '';
+            const sanitizedMessage = data.message.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-            messageBubble.innerHTML = `${senderNameHTML}<p class="text">${data.message}</p><span class="time">${time}${editedIndicator}</span>`;
+            messageBubble.innerHTML = `${senderNameHTML}<p class="text">${sanitizedMessage}</p><span class="time">${time}${editedIndicator}</span>`;
 
             if (messageWrapper.classList.contains('own')) {
                 let actions = messageWrapper.querySelector('.message-actions');
@@ -248,16 +255,18 @@
                         <button class="action-btn delete-btn" title="Hapus">
                             <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
                         </button>`;
-                    messageWrapper.appendChild(actions); 
+                    messageBubble.appendChild(actions); 
                 }
             } else {
                 const existingActions = messageWrapper.querySelector('.message-actions');
                 if(existingActions) existingActions.remove();
             }
-
-            if (messagesContainer.scrollHeight - messagesContainer.scrollTop < messagesContainer.clientHeight + 200) {
-                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            if (isNewMessage) {
+                messagesContainer.appendChild(messageWrapper);
             }
+
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
         
         async function fetchWithAuth(url, options = {}) {
@@ -273,11 +282,19 @@
                 if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
                 const history = await response.json();
                 messagesContainer.innerHTML = '';
-                history.forEach(data => displayMessage({ ...data, id: data.id }));
-            } catch (error) { console.error('Could not fetch chat history:', error); }
+                if(Array.isArray(history)) {
+                    history.forEach(data => {
+                        if (data.id) {
+                             displayMessage({ ...data, id: data.id });
+                        }
+                    });
+                }
+            } catch (error) { 
+                console.error('Could not fetch chat history:', error);
+                messagesContainer.innerHTML = `<p class="error-message" style="color:white;text-align:center;">Gagal memuat riwayat chat.</p>`;
+            }
         }
 
-        // --- Logika Aksi Pesan (Hapus & Edit) ---
         messagesContainer.addEventListener('click', async (e) => {
             const messageWrapper = e.target.closest('.message-wrapper');
             if (!messageWrapper) return;
@@ -302,8 +319,11 @@
             }
         });
         
-        // --- Listener Pusher (Diperbarui) ---
-        channel.bind('new-message', displayMessage);
+        channel.bind('new-message', data => {
+            if (data && data.message) {
+                displayMessage({ ...data, id: data.id || `realtime_${Math.random()}` });
+            }
+        });
         
         channel.bind('message-deleted', function(data) {
             const el = document.querySelector(`[data-id="${data.messageId}"]`);
@@ -315,14 +335,13 @@
             if(el) {
                 const textEl = el.querySelector('.text');
                 if (textEl) textEl.textContent = data.newText;
-                const timeEl = el.querySelector('.time');
+                let timeEl = el.querySelector('.time');
                 if (timeEl && !timeEl.querySelector('.edited-indicator')) {
                     timeEl.innerHTML += ' <span class="edited-indicator">(diubah)</span>';
                 }
             }
         });
         
-        // --- Logika Otentikasi & Form ---
         authToggleText.addEventListener('click', (e) => {
             e.preventDefault();
             if (e.target.tagName !== 'A') return;
@@ -361,14 +380,14 @@
         auth.onAuthStateChanged(user => {
             if (user) {
                 currentUser = user;
-                authScreen.style.display = 'none';
-                chatScreen.style.display = 'flex';
+                authScreen.classList.add('hidden');
+                chatScreen.classList.remove('hidden');
                 userInfo.textContent = `${user.email}`;
                 fetchChatHistory();
             } else {
                 currentUser = null;
-                authScreen.style.display = 'flex';
-                chatScreen.style.display = 'none';
+                authScreen.classList.remove('hidden');
+                chatScreen.classList.add('hidden');
             }
         });
 
